@@ -16,6 +16,8 @@ type MovieRepository interface {
 	Create(ctx context.Context, movie *Movie) error
 	FindAll(ctx context.Context) ([]Movie, error)
 	FindByID(ctx context.Context, id string) (*Movie, error)
+	Update(ctx context.Context, movie *Movie) error
+	Delete(ctx context.Context, id string) error
 }
 
 type ShowtimeRepository interface {
