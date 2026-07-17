@@ -15,7 +15,7 @@ const API = import.meta.env.VITE_API_URL || "/api/v1";
 const countdown = ref<number>(0);
 let timer: ReturnType<typeof setInterval> | null = null;
 
-const { data: seats, refetch: refetchSeats } = useQuery({
+const { data: seats, isLoading, isError, refetch: refetchSeats } = useQuery({
   queryKey: ["seats", route.params.id],
   queryFn: async () => {
     const res = await fetch(`${API}/showtimes/${route.params.id}/seats`, {
@@ -155,7 +155,7 @@ function seatColor(status: string) {
 }
 
 onMounted(() => {
-  sse.connectSeatUpdates(route.params.id as string);
+  sse.connectSeatUpdates(route.params.id as string, () => refetchSeats());
 });
 
 onUnmounted(() => {
@@ -179,7 +179,35 @@ onUnmounted(() => {
       </p>
     </div>
 
-    <div class="border rounded-lg p-6 mb-6">
+    <div v-if="isLoading" class="border rounded-lg p-6 mb-6">
+      <div class="text-center mb-6">
+        <div class="w-3/4 h-2 bg-gray-200 rounded mx-auto mb-2"></div>
+        <p class="text-xs text-muted-foreground">SCREEN</p>
+      </div>
+      <div class="flex flex-col justify-center gap-6">
+        <div v-for="r in 8" :key="r" class="flex flex-col items-center">
+          <div class="flex flex-row gap-2 items-center">
+            <span class="text-xs font-bold text-gray-300">{{ String.fromCharCode(64 + r) }}</span>
+            <div class="flex gap-1">
+              <div v-for="c in 8" :key="c" class="w-8 h-8 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else-if="isError" class="border rounded-lg p-6 mb-6 text-center">
+      <p class="text-destructive mb-4">Failed to load seats</p>
+      <button @click="refetchSeats()" class="px-4 py-2 border rounded text-sm hover:bg-muted">
+        Retry
+      </button>
+    </div>
+
+    <div v-else-if="!seats || seats.length === 0" class="border rounded-lg p-6 mb-6 text-center">
+      <p class="text-muted-foreground">No seats available for this showtime</p>
+    </div>
+
+    <div v-else class="border rounded-lg p-6 mb-6">
       <div class="text-center mb-6">
         <div class="w-3/4 h-2 bg-gray-300 rounded mx-auto mb-2"></div>
         <p class="text-xs text-muted-foreground">SCREEN</p>
