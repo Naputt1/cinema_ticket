@@ -79,6 +79,19 @@ func (h *BookingHandler) PayBooking(c *gin.Context) {
 	c.JSON(http.StatusOK, booking)
 }
 
+// CancelMyBooking cancels a booking by ID (for LOCKED bookings only).
+func (h *BookingHandler) CancelMyBooking(c *gin.Context) {
+	userID := c.GetString("user_id")
+	bookingID := c.Param("id")
+
+	if err := h.bookingUsecase.CancelBooking(c.Request.Context(), userID, bookingID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "booking cancelled"})
+}
+
 // CancelBooking cancels a locked booking.
 // @Summary Cancel booking
 // @Tags booking

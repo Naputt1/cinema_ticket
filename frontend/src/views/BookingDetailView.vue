@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
+import { toast } from 'vue-sonner'
 
 const route = useRoute()
 const router = useRouter()
@@ -15,6 +16,28 @@ const { data: booking, isLoading, isError } = useQuery({
       throw new Error('Failed to fetch booking')
     }
     return res.json()
+  },
+})
+
+const queryClient = useQueryClient()
+
+const cancelMutation = useMutation({
+  mutationFn: async () => {
+    const res = await fetch(`${API}/bookings/${route.params.id}/cancel`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.error || 'Cancel failed')
+    }
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['booking', route.params.id] })
+    toast.success('Booking cancelled')
+  },
+  onError: (err: Error) => {
+    toast.error(err.message)
   },
 })
 
@@ -102,6 +125,14 @@ function imgError(e: Event) {
           >
             {{ booking.status }}
           </span>
+          <button
+            v-if="booking.status === 'LOCKED'"
+            @click="cancelMutation.mutate()"
+            :disabled="cancelMutation.isPending.value"
+            class="text-sm px-3 py-1 border border-destructive text-destructive rounded hover:bg-destructive/5 disabled:opacity-50"
+          >
+            {{ cancelMutation.isPending.value ? 'Cancelling...' : 'Cancel Booking' }}
+          </button>
         </div>
         <div class="p-4 flex items-center justify-between">
           <span class="text-sm text-muted-foreground">Screen</span>
