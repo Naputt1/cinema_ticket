@@ -71,8 +71,8 @@ func main() {
 
 	authUsecase := usecase.NewAuthUsecase(userRepo, cfg)
 	movieUsecase := usecase.NewMovieUsecase(movieRepo, showtimeRepo, seatRepo)
-	bookingUsecase := usecase.NewBookingUsecase(bookingRepo, seatRepo, showtimeRepo, lockRepo, rmqPublisher, auditRepo)
-	adminUsecase := usecase.NewAdminUsecase(bookingRepo, auditRepo)
+	bookingUsecase := usecase.NewBookingUsecase(bookingRepo, seatRepo, showtimeRepo, movieRepo, lockRepo, rmqPublisher, auditRepo)
+	adminUsecase := usecase.NewAdminUsecase(bookingRepo, showtimeRepo, movieRepo, seatRepo, userRepo, auditRepo)
 	sseHandler := handler.NewSSEHandler()
 
 	// RabbitMQ consumer for SSE bridge

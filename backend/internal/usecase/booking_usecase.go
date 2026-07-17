@@ -20,6 +20,7 @@ type BookingUsecase struct {
 	bookingRepo  domain.BookingRepository
 	seatRepo     domain.SeatRepository
 	showtimeRepo domain.ShowtimeRepository
+	movieRepo    domain.MovieRepository
 	lockRepo     RedisLockRepo
 	eventPub     domain.EventPublisher
 	auditRepo    domain.AuditLogRepository
@@ -29,6 +30,7 @@ func NewBookingUsecase(
 	bookingRepo domain.BookingRepository,
 	seatRepo domain.SeatRepository,
 	showtimeRepo domain.ShowtimeRepository,
+	movieRepo domain.MovieRepository,
 	lockRepo RedisLockRepo,
 	eventPub domain.EventPublisher,
 	auditRepo domain.AuditLogRepository,
@@ -37,6 +39,7 @@ func NewBookingUsecase(
 		bookingRepo:  bookingRepo,
 		seatRepo:     seatRepo,
 		showtimeRepo: showtimeRepo,
+		movieRepo:    movieRepo,
 		lockRepo:     lockRepo,
 		eventPub:     eventPub,
 		auditRepo:    auditRepo,
@@ -207,12 +210,58 @@ func (uc *BookingUsecase) releaseBooking(ctx context.Context, booking *domain.Bo
 	return nil
 }
 
-func (uc *BookingUsecase) GetUserBookings(ctx context.Context, userID string) ([]domain.Booking, error) {
-	return uc.bookingRepo.FindByUserID(ctx, userID)
+func (uc *BookingUsecase) GetUserBookings(ctx context.Context, userID string) ([]domain.BookingDetail, error) {
+	bookings, err := uc.bookingRepo.FindByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	details := make([]domain.BookingDetail, 0, len(bookings))
+	for _, b := range bookings {
+		d, err := uc.enrichBooking(ctx, &b)
+		if err != nil {
+			return nil, err
+		}
+		details = append(details, *d)
+	}
+	return details, nil
 }
 
-func (uc *BookingUsecase) GetBooking(ctx context.Context, bookingID string) (*domain.Booking, error) {
-	return uc.bookingRepo.FindByID(ctx, bookingID)
+func (uc *BookingUsecase) GetBooking(ctx context.Context, bookingID string) (*domain.BookingDetail, error) {
+	booking, err := uc.bookingRepo.FindByID(ctx, bookingID)
+	if err != nil || booking == nil {
+		return nil, err
+	}
+	return uc.enrichBooking(ctx, booking)
+}
+
+func (uc *BookingUsecase) enrichBooking(ctx context.Context, booking *domain.Booking) (*domain.BookingDetail, error) {
+	showtime, err := uc.showtimeRepo.FindByID(ctx, booking.ShowtimeID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find showtime: %w", err)
+	}
+
+	movie, err := uc.movieRepo.FindByID(ctx, showtime.MovieID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find movie: %w", err)
+	}
+
+	seats, err := uc.seatRepo.FindByIDs(ctx, booking.SeatIDs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find seats: %w", err)
+	}
+
+	return &domain.BookingDetail{
+		ID:        booking.ID,
+		UserID:    booking.UserID,
+		Showtime:  *showtime,
+		Movie:     *movie,
+		Seats:     seats,
+		Status:    booking.Status,
+		ExpiresAt: booking.ExpiresAt,
+		CreatedAt: booking.CreatedAt,
+		UpdatedAt: booking.UpdatedAt,
+	}, nil
 }
 
 func (uc *BookingUsecase) rollbackLocks(ctx context.Context, userID string, showtimeID string, seatIDs []string) {

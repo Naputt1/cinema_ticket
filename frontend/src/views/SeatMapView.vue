@@ -1,157 +1,182 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
-import { useBookingStore } from '../stores/booking'
-import { useSSE } from '../composables/useSSE'
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/vue-query";
+import { useBookingStore } from "../stores/booking";
+import { useSSE } from "../composables/useSSE";
 
-const route = useRoute()
-const router = useRouter()
-const booking = useBookingStore()
-const sse = useSSE()
-const queryClient = useQueryClient()
-const API = import.meta.env.VITE_API_URL || '/api/v1'
+const route = useRoute();
+const router = useRouter();
+const booking = useBookingStore();
+const sse = useSSE();
+const queryClient = useQueryClient();
+const API = import.meta.env.VITE_API_URL || "/api/v1";
 
-const countdown = ref<number>(0)
-let timer: ReturnType<typeof setInterval> | null = null
+const countdown = ref<number>(0);
+let timer: ReturnType<typeof setInterval> | null = null;
 
 const { data: seats, refetch: refetchSeats } = useQuery({
-  queryKey: ['seats', route.params.id],
+  queryKey: ["seats", route.params.id],
   queryFn: async () => {
-    const res = await fetch(`${API}/showtimes/${route.params.id}/seats`, { credentials: 'include' })
-    if (!res.ok) throw new Error('Failed to fetch seats')
-    return res.json()
+    const res = await fetch(`${API}/showtimes/${route.params.id}/seats`, {
+      credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch seats");
+    return res.json();
   },
-})
+});
 
 const groupedSeats = computed(() => {
-  const rows: Record<string, any[]> = {}
+  const rows: Record<string, any[]> = {};
   for (const s of (seats.value as any[]) || []) {
-    if (!rows[s.row]) rows[s.row] = []
-    rows[s.row].push(s)
+    if (!rows[s.row]) rows[s.row] = [];
+    rows[s.row].push(s);
   }
   for (const row of Object.keys(rows)) {
-    rows[row].sort((a, b) => a.number - b.number)
+    rows[row].sort((a, b) => a.number - b.number);
   }
-  return rows
+  return rows;
+});
+
+const selectedSeatLabels = computed(() => {
+  const allSeats = (seats.value as any[]) || []
+  return Array.from(booking.selectedSeats).map(id => {
+    const s = allSeats.find(s => s.id === id)
+    return s ? `${s.row}${s.number}` : id
+  })
 })
 
 const lockedMutation = useMutation({
   mutationFn: async (seatIDs: string[]) => {
     const res = await fetch(`${API}/bookings/lock`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ showtime_id: route.params.id, seat_ids: seatIDs }),
-    })
+    });
     if (!res.ok) {
-      const err = await res.json()
-      throw new Error(err.error || 'Failed to lock seats')
+      const err = await res.json();
+      throw new Error(err.error || "Failed to lock seats");
     }
-    return res.json()
+    return res.json();
   },
   onSuccess: (data: any) => {
-    booking.setBooking(data.id, data.expires_at)
-    startCountdown(data.expires_at)
-    refetchSeats()
+    booking.setBooking(data.id, data.expires_at);
+    startCountdown(data.expires_at);
+    refetchSeats();
   },
-})
+});
 
 const payMutation = useMutation({
   mutationFn: async () => {
     const res = await fetch(`${API}/bookings/pay`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ booking_id: booking.currentBookingId }),
-    })
-    if (!res.ok) throw new Error('Payment failed')
-    return res.json()
+    });
+    if (!res.ok) throw new Error("Payment failed");
+    return res.json();
   },
   onSuccess: () => {
-    booking.clearSelection()
-    if (timer) clearInterval(timer)
-    countdown.value = 0
-    refetchSeats()
-    router.push('/bookings')
+    booking.clearSelection();
+    if (timer) clearInterval(timer);
+    countdown.value = 0;
+    refetchSeats();
+    router.push("/bookings");
   },
-})
+});
 
 const cancelMutation = useMutation({
   mutationFn: async () => {
     const res = await fetch(`${API}/bookings/cancel`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ booking_id: booking.currentBookingId }),
-    })
-    if (!res.ok) throw new Error('Cancel failed')
+    });
+    if (!res.ok) throw new Error("Cancel failed");
   },
   onSuccess: () => {
-    booking.clearSelection()
-    if (timer) clearInterval(timer)
-    countdown.value = 0
-    refetchSeats()
+    booking.clearSelection();
+    if (timer) clearInterval(timer);
+    countdown.value = 0;
+    refetchSeats();
   },
-})
+});
 
-function getSeatStatus(seat: any): 'AVAILABLE' | 'LOCKED' | 'BOOKED' | 'SELECTED' {
-  if (booking.selectedSeats.has(seat.id)) return 'SELECTED'
-  return seat.status
+function getSeatStatus(
+  seat: any,
+): "AVAILABLE" | "LOCKED" | "BOOKED" | "SELECTED" {
+  if (booking.selectedSeats.has(seat.id)) return "SELECTED";
+  return seat.status;
 }
 
 function toggleSeat(seat: any) {
-  if (seat.status !== 'AVAILABLE' && !booking.selectedSeats.has(seat.id)) return
-  if (booking.currentBookingId) return
-  booking.toggleSeat(seat.id)
+  if (seat.status !== "AVAILABLE" && !booking.selectedSeats.has(seat.id))
+    return;
+  if (booking.currentBookingId) return;
+  booking.toggleSeat(seat.id);
 }
 
 async function handleLock() {
-  const ids = Array.from(booking.selectedSeats)
-  if (ids.length === 0) return
-  await lockedMutation.mutateAsync(ids)
+  const ids = Array.from(booking.selectedSeats);
+  if (ids.length === 0) return;
+  await lockedMutation.mutateAsync(ids);
 }
 
 function startCountdown(expiresAt: string) {
-  const target = new Date(expiresAt).getTime()
-  if (timer) clearInterval(timer)
+  const target = new Date(expiresAt).getTime();
+  if (timer) clearInterval(timer);
   timer = setInterval(() => {
-    const remaining = Math.max(0, Math.floor((target - Date.now()) / 1000))
-    countdown.value = remaining
+    const remaining = Math.max(0, Math.floor((target - Date.now()) / 1000));
+    countdown.value = remaining;
     if (remaining <= 0) {
-      if (timer) clearInterval(timer)
-      booking.clearSelection()
-      refetchSeats()
+      if (timer) clearInterval(timer);
+      booking.clearSelection();
+      refetchSeats();
     }
-  }, 1000)
+  }, 1000);
 }
 
 function seatColor(status: string) {
   switch (status) {
-    case 'AVAILABLE': return 'bg-green-100 border-green-300 hover:bg-green-200 cursor-pointer'
-    case 'LOCKED': return 'bg-yellow-100 border-yellow-300 cursor-not-allowed opacity-60'
-    case 'BOOKED': return 'bg-red-100 border-red-300 cursor-not-allowed opacity-60'
-    case 'SELECTED': return 'bg-blue-500 border-blue-600 text-white cursor-pointer'
-    default: return 'bg-gray-100 border-gray-300'
+    case "AVAILABLE":
+      return "bg-green-100 border-green-300 hover:bg-green-200 cursor-pointer";
+    case "LOCKED":
+      return "bg-yellow-100 border-yellow-300 cursor-not-allowed opacity-60";
+    case "BOOKED":
+      return "bg-red-100 border-red-300 cursor-not-allowed opacity-60";
+    case "SELECTED":
+      return "bg-blue-500 border-blue-600 text-white cursor-pointer";
+    default:
+      return "bg-gray-100 border-gray-300";
   }
 }
 
 onMounted(() => {
-  sse.connectSeatUpdates(route.params.id as string)
-})
+  sse.connectSeatUpdates(route.params.id as string);
+});
 
 onUnmounted(() => {
-  sse.disconnectSeatUpdates()
-  if (timer) clearInterval(timer)
-})
+  sse.disconnectSeatUpdates();
+  if (timer) clearInterval(timer);
+});
 </script>
 
 <template>
   <div>
     <h1 class="text-2xl font-bold mb-4">Select Seats</h1>
 
-    <div v-if="countdown > 0" class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-center">
-      <p class="text-sm font-medium">Time left to pay: {{ Math.floor(countdown / 60) }}:{{ String(countdown % 60).padStart(2, '0') }}</p>
+    <div
+      v-if="countdown > 0"
+      class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-center"
+    >
+      <p class="text-sm font-medium">
+        Time left to pay: {{ Math.floor(countdown / 60) }}:{{
+          String(countdown % 60).padStart(2, "0")
+        }}
+      </p>
     </div>
 
     <div class="border rounded-lg p-6 mb-6">
@@ -160,35 +185,60 @@ onUnmounted(() => {
         <p class="text-xs text-muted-foreground">SCREEN</p>
       </div>
 
-      <div class="flex justify-center gap-6">
-        <div v-for="(rowSeats, row) in groupedSeats" :key="row" class="flex flex-col items-center">
-          <span class="text-xs font-bold mb-1">{{ row }}</span>
-          <div class="flex gap-1">
-            <button
-              v-for="seat in rowSeats"
-              :key="seat.id"
-              :disabled="seat.status !== 'AVAILABLE' && !booking.selectedSeats.has(seat.id)"
-              @click="toggleSeat(seat)"
-              class="w-8 h-8 text-xs border rounded transition-colors"
-              :class="seatColor(getSeatStatus(seat))"
-            >
-              {{ seat.number }}
-            </button>
+      <div class="flex flex-col justify-center gap-6">
+        <div
+          v-for="(rowSeats, row) in groupedSeats"
+          :key="row"
+          class="flex flex-col items-center"
+        >
+          <div class="flex flex-row gap-2 items-center">
+            <span class="text-xs font-bold">{{ row }}</span>
+            <div class="flex gap-1">
+              <button
+                v-for="seat in rowSeats"
+                :key="seat.id"
+                :disabled="
+                  seat.status !== 'AVAILABLE' &&
+                  !booking.selectedSeats.has(seat.id)
+                "
+                @click="toggleSeat(seat)"
+                class="w-8 h-8 text-xs border rounded transition-colors"
+                :class="seatColor(getSeatStatus(seat))"
+              >
+                {{ seat.number }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="flex justify-center gap-6 mt-6 text-xs">
-        <div class="flex items-center gap-1"><div class="w-4 h-4 bg-green-100 border border-green-300 rounded"></div> Available</div>
-        <div class="flex items-center gap-1"><div class="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded"></div> Locked</div>
-        <div class="flex items-center gap-1"><div class="w-4 h-4 bg-red-100 border border-red-300 rounded"></div> Booked</div>
-        <div class="flex items-center gap-1"><div class="w-4 h-4 bg-blue-500 border border-blue-600 rounded"></div> Selected</div>
+        <div class="flex items-center gap-1">
+          <div
+            class="w-4 h-4 bg-green-100 border border-green-300 rounded"
+          ></div>
+          Available
+        </div>
+        <div class="flex items-center gap-1">
+          <div
+            class="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded"
+          ></div>
+          Locked
+        </div>
+        <div class="flex items-center gap-1">
+          <div class="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
+          Booked
+        </div>
+        <div class="flex items-center gap-1">
+          <div class="w-4 h-4 bg-blue-500 border border-blue-600 rounded"></div>
+          Selected
+        </div>
       </div>
     </div>
 
     <div class="flex justify-between items-center">
       <p class="text-sm text-muted-foreground">
-        Selected: {{ Array.from(booking.selectedSeats).join(', ') || 'None' }}
+        Selected: {{ selectedSeatLabels.join(", ") || "None" }}
       </p>
       <div class="flex gap-2">
         <button
@@ -211,13 +261,20 @@ onUnmounted(() => {
           v-else
           @click="handleLock()"
           class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:opacity-90"
-          :disabled="booking.selectedSeats.size === 0 || lockedMutation.isPending.value"
+          :disabled="
+            booking.selectedSeats.size === 0 || lockedMutation.isPending.value
+          "
         >
-          {{ lockedMutation.isPending.value ? 'Locking...' : 'Lock Seats' }}
+          {{ lockedMutation.isPending.value ? "Locking..." : "Lock Seats" }}
         </button>
       </div>
     </div>
 
-    <p v-if="lockedMutation.isError.value" class="mt-2 text-sm text-destructive">{{ (lockedMutation.error as any)?.message }}</p>
+    <p
+      v-if="lockedMutation.isError.value"
+      class="mt-2 text-sm text-destructive"
+    >
+      {{ (lockedMutation.error as any)?.message }}
+    </p>
   </div>
 </template>

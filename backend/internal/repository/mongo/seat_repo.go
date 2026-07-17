@@ -46,6 +46,20 @@ func (r *seatRepository) FindByShowtimeID(ctx context.Context, showtimeID string
 	return seats, nil
 }
 
+func (r *seatRepository) FindByIDs(ctx context.Context, ids []string) ([]domain.Seat, error) {
+	cursor, err := r.coll.Find(ctx, bson.M{"_id": bson.M{"$in": ids}})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var seats []domain.Seat
+	if err := cursor.All(ctx, &seats); err != nil {
+		return nil, err
+	}
+	return seats, nil
+}
+
 func (r *seatRepository) FindByID(ctx context.Context, id string) (*domain.Seat, error) {
 	var seat domain.Seat
 	err := r.coll.FindOne(ctx, bson.M{"_id": id}).Decode(&seat)

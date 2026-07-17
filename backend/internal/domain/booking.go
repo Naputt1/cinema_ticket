@@ -38,3 +38,16 @@ type Seat struct {
 	Status     SeatStatus `json:"status" bson:"status"`
 	Screen     string     `json:"screen" bson:"screen"`
 }
+
+type BookingDetail struct {
+	ID        string        `json:"id"`
+	UserID    string        `json:"user_id"`
+	UserEmail string        `json:"user_email"`
+	Showtime  Showtime      `json:"showtime"`
+	Movie     Movie         `json:"movie"`
+	Seats     []Seat        `json:"seats"`
+	Status    BookingStatus `json:"status"`
+	ExpiresAt *time.Time    `json:"expires_at,omitempty"`
+	CreatedAt time.Time     `json:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at"`
+}

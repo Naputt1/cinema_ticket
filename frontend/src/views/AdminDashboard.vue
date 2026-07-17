@@ -23,8 +23,16 @@ const { data: logs } = useQuery({
   },
 })
 
-function formatDate(iso: string) {
+function seatLabel(s: { row: string; number: number }) {
+  return `${s.row}${s.number}`
+}
+
+function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString()
+}
+
+function formatPrice(price: number) {
+  return price?.toFixed(2)
 }
 </script>
 
@@ -52,12 +60,26 @@ function formatDate(iso: string) {
     <div v-if="activeTab === 'bookings'">
       <div class="space-y-2">
         <div v-for="b in (bookings as any[] || [])" :key="b.id" class="border rounded p-3 text-sm">
-          <div class="flex justify-between">
-            <span><strong>ID:</strong> {{ b.id?.slice(0, 8) }}</span>
-            <span :class="b.status === 'BOOKED' ? 'text-green-600' : b.status === 'LOCKED' ? 'text-yellow-600' : 'text-red-600'">{{ b.status }}</span>
+          <div class="flex justify-between items-center mb-1">
+            <span class="font-medium">{{ b.movie?.title }}</span>
+            <span
+              class="text-xs font-medium px-2 py-0.5 rounded"
+              :class="b.status === 'BOOKED' ? 'text-green-700 bg-green-50' : b.status === 'LOCKED' ? 'text-yellow-700 bg-yellow-50' : 'text-red-700 bg-red-50'"
+            >
+              {{ b.status }}
+            </span>
           </div>
-          <p class="text-muted-foreground">User: {{ b.user_id?.slice(0, 8) }} | Seats: {{ b.seat_ids?.join(', ') }}</p>
-          <p class="text-muted-foreground">{{ formatDate(b.created_at) }}</p>
+          <p class="text-muted-foreground">
+            {{ b.showtime?.screen }} · {{ formatDateTime(b.showtime?.start_time) }}
+          </p>
+          <p class="text-muted-foreground">
+            User: {{ b.user_email || b.user_id?.slice(0, 8) }}
+          </p>
+          <p class="text-muted-foreground">
+            Seats: {{ b.seats?.map(seatLabel).join(', ') || '—' }}
+            <span class="ml-2">${{ formatPrice(b.showtime?.price) }} × {{ b.seats?.length || 0 }}</span>
+          </p>
+          <p class="text-muted-foreground text-xs mt-1">{{ formatDateTime(b.created_at) }}</p>
         </div>
       </div>
     </div>
@@ -67,7 +89,7 @@ function formatDate(iso: string) {
         <div v-for="log in (logs as any[] || [])" :key="log.id" class="border rounded p-3 text-sm">
           <div class="flex justify-between">
             <span class="font-medium">{{ log.event_type }}</span>
-            <span class="text-muted-foreground">{{ formatDate(log.created_at) }}</span>
+            <span class="text-muted-foreground">{{ formatDateTime(log.created_at) }}</span>
           </div>
           <p class="text-muted-foreground mt-1">{{ log.detail }}</p>
         </div>

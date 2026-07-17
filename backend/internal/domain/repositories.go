@@ -29,6 +29,7 @@ type SeatRepository interface {
 	Create(ctx context.Context, seat *Seat) error
 	BulkCreate(ctx context.Context, seats []Seat) error
 	FindByShowtimeID(ctx context.Context, showtimeID string) ([]Seat, error)
+	FindByIDs(ctx context.Context, ids []string) ([]Seat, error)
 	FindByID(ctx context.Context, id string) (*Seat, error)
 	UpdateStatus(ctx context.Context, id string, status SeatStatus) error
 	BulkUpdateStatus(ctx context.Context, ids []string, status SeatStatus) error
