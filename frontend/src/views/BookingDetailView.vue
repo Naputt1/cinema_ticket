@@ -116,26 +116,14 @@ function imgError(e: Event) {
           <span class="text-sm font-medium">{{ formatTime(booking.showtime?.start_time) }}</span>
         </div>
         <div class="p-4 flex items-center justify-between">
-          <span class="text-sm text-muted-foreground">Seats</span>
+          <span class="text-sm text-muted-foreground">Seats ({{ booking.seats?.length }} × ${{ booking.price?.toFixed(2) }})</span>
           <div class="text-right">
-            <p
-              v-for="s in booking.seats"
-              :key="s.id"
-              class="text-sm font-medium"
-            >
-              {{ seatLabel(s) }}
-            </p>
+            <p v-for="s in booking.seats" :key="s.id" class="text-sm font-medium">{{ seatLabel(s) }}</p>
           </div>
-        </div>
-        <div class="p-4 flex items-center justify-between">
-          <span class="text-sm text-muted-foreground">Price per seat</span>
-          <span class="text-sm font-medium">${{ booking.showtime?.price?.toFixed(2) }}</span>
         </div>
         <div class="p-4 flex items-center justify-between bg-muted/50">
           <span class="text-sm font-semibold">Total</span>
-          <span class="text-lg font-bold">
-            ${{ (booking.showtime?.price * (booking.seats?.length || 1))?.toFixed(2) }}
-          </span>
+          <span class="text-lg font-bold">${{ booking.total_amount?.toFixed(2) }}</span>
         </div>
         <div class="p-4 flex items-center justify-between">
           <span class="text-sm text-muted-foreground">Booked on</span>

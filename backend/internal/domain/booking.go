@@ -16,10 +16,12 @@ type Booking struct {
 	UserID     string        `json:"user_id" bson:"user_id"`
 	ShowtimeID string        `json:"showtime_id" bson:"showtime_id"`
 	SeatIDs    []string      `json:"seat_ids" bson:"seat_ids"`
-	Status     BookingStatus `json:"status" bson:"status"`
-	ExpiresAt  *time.Time    `json:"expires_at,omitempty" bson:"expires_at,omitempty"`
-	CreatedAt  time.Time     `json:"created_at" bson:"created_at"`
-	UpdatedAt  time.Time     `json:"updated_at" bson:"updated_at"`
+	Status      BookingStatus `json:"status" bson:"status"`
+	ExpiresAt   *time.Time    `json:"expires_at,omitempty" bson:"expires_at,omitempty"`
+	Price       float64       `json:"price" bson:"price"`
+	TotalAmount float64       `json:"total_amount" bson:"total_amount"`
+	CreatedAt   time.Time     `json:"created_at" bson:"created_at"`
+	UpdatedAt   time.Time     `json:"updated_at" bson:"updated_at"`
 }
 
 type SeatStatus string
@@ -46,8 +48,10 @@ type BookingDetail struct {
 	Showtime  Showtime      `json:"showtime"`
 	Movie     Movie         `json:"movie"`
 	Seats     []Seat        `json:"seats"`
-	Status    BookingStatus `json:"status"`
-	ExpiresAt *time.Time    `json:"expires_at,omitempty"`
-	CreatedAt time.Time     `json:"created_at"`
-	UpdatedAt time.Time     `json:"updated_at"`
+	Status      BookingStatus `json:"status"`
+	ExpiresAt   *time.Time    `json:"expires_at,omitempty"`
+	Price       float64       `json:"price"`
+	TotalAmount float64       `json:"total_amount"`
+	CreatedAt   time.Time     `json:"created_at"`
+	UpdatedAt   time.Time     `json:"updated_at"`
 }

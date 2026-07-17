@@ -96,16 +96,18 @@ func (uc *AdminUsecase) enrichBooking(ctx context.Context, booking *domain.Booki
 	}
 
 	return &domain.BookingDetail{
-		ID:        booking.ID,
-		UserID:    booking.UserID,
-		UserEmail: userEmail,
-		Showtime:  *showtime,
-		Movie:     *movie,
-		Seats:     seats,
-		Status:    booking.Status,
-		ExpiresAt: booking.ExpiresAt,
-		CreatedAt: booking.CreatedAt,
-		UpdatedAt: booking.UpdatedAt,
+		ID:          booking.ID,
+		UserID:      booking.UserID,
+		UserEmail:   userEmail,
+		Showtime:    *showtime,
+		Movie:       *movie,
+		Seats:       seats,
+		Status:      booking.Status,
+		ExpiresAt:   booking.ExpiresAt,
+		Price:       booking.Price,
+		TotalAmount: booking.TotalAmount,
+		CreatedAt:   booking.CreatedAt,
+		UpdatedAt:   booking.UpdatedAt,
 	}, nil
 }
 
