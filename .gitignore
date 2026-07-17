@@ -1,0 +1,12 @@
+.env
+node_modules/
+dist/
+backend/dist/
+frontend/dist/
+*.log
+.DS_Store
+backend/vendor/
+backend/go.sum
+frontend/package-lock.json
+temp/
+tmp/
