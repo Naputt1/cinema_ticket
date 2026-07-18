@@ -87,7 +87,7 @@ function imgError(e: Event) {
             </p>
           </div>
           <div class="flex items-center gap-3">
-            <span class="text-sm font-semibold">${{ b.showtime?.price?.toFixed(2) }}</span>
+            <span class="text-sm font-semibold">${{ b.total_amount?.toFixed(2) }}</span>
             <span
               class="text-xs font-medium px-2.5 py-1 rounded-full border"
               :class="statusColor(b.status)"

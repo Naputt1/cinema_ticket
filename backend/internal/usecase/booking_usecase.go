@@ -71,14 +71,16 @@ func (uc *BookingUsecase) LockSeat(ctx context.Context, userID string, showtimeI
 
 	expiresAt := time.Now().Add(5 * time.Minute)
 	booking := &domain.Booking{
-		ID:         uuid.New().String(),
-		UserID:     userID,
-		ShowtimeID: showtimeID,
-		SeatIDs:    seatIDs,
-		Status:     domain.BookingStatusLocked,
-		ExpiresAt:  &expiresAt,
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
+		ID:          uuid.New().String(),
+		UserID:      userID,
+		ShowtimeID:  showtimeID,
+		SeatIDs:     seatIDs,
+		Status:      domain.BookingStatusLocked,
+		ExpiresAt:   &expiresAt,
+		Price:       showtime.Price,
+		TotalAmount: showtime.Price * float64(len(seatIDs)),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 
 	if err := uc.bookingRepo.Create(ctx, booking); err != nil {
@@ -252,15 +254,17 @@ func (uc *BookingUsecase) enrichBooking(ctx context.Context, booking *domain.Boo
 	}
 
 	return &domain.BookingDetail{
-		ID:        booking.ID,
-		UserID:    booking.UserID,
-		Showtime:  *showtime,
-		Movie:     *movie,
-		Seats:     seats,
-		Status:    booking.Status,
-		ExpiresAt: booking.ExpiresAt,
-		CreatedAt: booking.CreatedAt,
-		UpdatedAt: booking.UpdatedAt,
+		ID:          booking.ID,
+		UserID:      booking.UserID,
+		Showtime:    *showtime,
+		Movie:       *movie,
+		Seats:       seats,
+		Status:      booking.Status,
+		ExpiresAt:   booking.ExpiresAt,
+		Price:       booking.Price,
+		TotalAmount: booking.TotalAmount,
+		CreatedAt:   booking.CreatedAt,
+		UpdatedAt:   booking.UpdatedAt,
 	}, nil
 }
 
