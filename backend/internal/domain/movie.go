@@ -19,4 +19,5 @@ type Showtime struct {
 	StartTime time.Time `json:"start_time" bson:"start_time"`
 	EndTime   time.Time `json:"end_time" bson:"end_time"`
 	Price     float64   `json:"price" bson:"price"`
+	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
 }

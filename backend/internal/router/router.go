@@ -69,5 +69,9 @@ func Setup(r *gin.Engine, h *Handlers, jwtSecret string, frontendURL string) {
 		admin.POST("/movies", h.Admin.CreateMovie)
 		admin.PUT("/movies/:id", h.Admin.UpdateMovie)
 		admin.DELETE("/movies/:id", h.Admin.DeleteMovie)
+		admin.GET("/showtimes", h.Admin.GetShowtimes)
+		admin.POST("/movies/:id/showtimes", h.Admin.CreateShowtime)
+		admin.PUT("/showtimes/:id", h.Admin.UpdateShowtime)
+		admin.DELETE("/showtimes/:id", h.Admin.DeleteShowtime)
 	}
 }

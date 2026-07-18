@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -99,6 +100,64 @@ func (h *AdminHandler) UpdateMovie(c *gin.Context) {
 func (h *AdminHandler) DeleteMovie(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.adminUsecase.DeleteMovie(c.Request.Context(), id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "deleted"})
+}
+
+func (h *AdminHandler) GetShowtimes(c *gin.Context) {
+	showtimes, err := h.adminUsecase.GetAllShowtimes(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, showtimes)
+}
+
+type createShowtimeReq struct {
+	Screen    string    `json:"screen" binding:"required"`
+	StartTime time.Time `json:"start_time" binding:"required"`
+	Price     float64   `json:"price" binding:"required"`
+}
+
+func (h *AdminHandler) CreateShowtime(c *gin.Context) {
+	movieID := c.Param("id")
+	var req createShowtimeReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	st := &domain.Showtime{
+		Screen:    req.Screen,
+		StartTime: req.StartTime,
+		Price:     req.Price,
+	}
+	if err := h.adminUsecase.CreateShowtime(c.Request.Context(), movieID, st); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, st)
+}
+
+func (h *AdminHandler) UpdateShowtime(c *gin.Context) {
+	id := c.Param("id")
+	var st domain.Showtime
+	if err := c.ShouldBindJSON(&st); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	st.ID = id
+	if err := h.adminUsecase.UpdateShowtime(c.Request.Context(), &st); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, st)
+}
+
+func (h *AdminHandler) DeleteShowtime(c *gin.Context) {
+	id := c.Param("id")
+	if err := h.adminUsecase.DeleteShowtime(c.Request.Context(), id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

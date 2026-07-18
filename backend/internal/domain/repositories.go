@@ -22,9 +22,12 @@ type MovieRepository interface {
 
 type ShowtimeRepository interface {
 	Create(ctx context.Context, showtime *Showtime) error
+	FindAll(ctx context.Context) ([]Showtime, error)
 	FindByMovieID(ctx context.Context, movieID string) ([]Showtime, error)
 	FindByID(ctx context.Context, id string) (*Showtime, error)
 	CreateMany(ctx context.Context, showtimes []Showtime) error
+	Update(ctx context.Context, showtime *Showtime) error
+	Delete(ctx context.Context, id string) error
 }
 
 type SeatRepository interface {

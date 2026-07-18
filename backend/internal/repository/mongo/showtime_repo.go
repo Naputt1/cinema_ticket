@@ -46,6 +46,29 @@ func (r *showtimeRepository) FindByMovieID(ctx context.Context, movieID string) 
 	return showtimes, nil
 }
 
+func (r *showtimeRepository) FindAll(ctx context.Context) ([]domain.Showtime, error) {
+	cursor, err := r.coll.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+	var showtimes []domain.Showtime
+	if err := cursor.All(ctx, &showtimes); err != nil {
+		return nil, err
+	}
+	return showtimes, nil
+}
+
+func (r *showtimeRepository) Update(ctx context.Context, showtime *domain.Showtime) error {
+	_, err := r.coll.ReplaceOne(ctx, bson.M{"_id": showtime.ID}, showtime)
+	return err
+}
+
+func (r *showtimeRepository) Delete(ctx context.Context, id string) error {
+	_, err := r.coll.DeleteOne(ctx, bson.M{"_id": id})
+	return err
+}
+
 func (r *showtimeRepository) FindByID(ctx context.Context, id string) (*domain.Showtime, error) {
 	var showtime domain.Showtime
 	err := r.coll.FindOne(ctx, bson.M{"_id": id}).Decode(&showtime)
