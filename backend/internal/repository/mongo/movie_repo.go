@@ -45,3 +45,13 @@ func (r *movieRepository) FindByID(ctx context.Context, id string) (*domain.Movi
 	}
 	return &movie, err
 }
+
+func (r *movieRepository) Update(ctx context.Context, movie *domain.Movie) error {
+	_, err := r.coll.ReplaceOne(ctx, bson.M{"_id": movie.ID}, movie)
+	return err
+}
+
+func (r *movieRepository) Delete(ctx context.Context, id string) error {
+	_, err := r.coll.DeleteOne(ctx, bson.M{"_id": id})
+	return err
+}

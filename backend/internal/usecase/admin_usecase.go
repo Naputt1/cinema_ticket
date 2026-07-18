@@ -3,7 +3,9 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/naputt/cinema-ticket-backend/internal/domain"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -109,6 +111,25 @@ func (uc *AdminUsecase) enrichBooking(ctx context.Context, booking *domain.Booki
 		CreatedAt:   booking.CreatedAt,
 		UpdatedAt:   booking.UpdatedAt,
 	}, nil
+}
+
+func (uc *AdminUsecase) GetAllMovies(ctx context.Context) ([]domain.Movie, error) {
+	return uc.movieRepo.FindAll(ctx)
+}
+
+func (uc *AdminUsecase) CreateMovie(ctx context.Context, movie *domain.Movie) error {
+	movie.ID = uuid.New().String()
+	movie.UpdatedAt = time.Now()
+	return uc.movieRepo.Create(ctx, movie)
+}
+
+func (uc *AdminUsecase) UpdateMovie(ctx context.Context, movie *domain.Movie) error {
+	movie.UpdatedAt = time.Now()
+	return uc.movieRepo.Update(ctx, movie)
+}
+
+func (uc *AdminUsecase) DeleteMovie(ctx context.Context, id string) error {
+	return uc.movieRepo.Delete(ctx, id)
 }
 
 func (uc *AdminUsecase) GetAuditLogs(ctx context.Context, eventType string) ([]domain.AuditLog, error) {

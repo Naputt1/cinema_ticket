@@ -3,12 +3,13 @@ package domain
 import "time"
 
 type Movie struct {
-	ID          string `json:"id" bson:"_id"`
-	Title       string `json:"title" bson:"title"`
-	Description string `json:"description" bson:"description"`
-	Duration    int    `json:"duration" bson:"duration"`
-	PosterURL   string `json:"poster_url" bson:"poster_url"`
-	Genre       string `json:"genre" bson:"genre"`
+	ID          string    `json:"id" bson:"_id"`
+	Title       string    `json:"title" bson:"title"`
+	Description string    `json:"description" bson:"description"`
+	Duration    int       `json:"duration" bson:"duration"`
+	PosterURL   string    `json:"poster_url" bson:"poster_url"`
+	Genre       string    `json:"genre" bson:"genre"`
+	UpdatedAt   time.Time `json:"updated_at" bson:"updated_at"`
 }
 
 type Showtime struct {
