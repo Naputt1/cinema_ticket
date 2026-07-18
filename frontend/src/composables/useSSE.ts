@@ -24,13 +24,14 @@ export function useSSE() {
     } catch {}
   }
 
-  function connectSeatUpdates(showtimeID: string) {
+  function connectSeatUpdates(showtimeID: string, onMessage?: (event: MessageEvent) => void) {
     if (!showtimeID) return
 
     if (seatEventSource) seatEventSource.close()
 
     try {
       const es = new EventSource(`${API}/events/seats?showtime_id=${showtimeID}`)
+      es.onmessage = onMessage || null
       seatEventSource = es
     } catch {}
   }
