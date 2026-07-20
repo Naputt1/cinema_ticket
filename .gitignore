@@ -10,3 +10,4 @@ backend/go.sum
 frontend/package-lock.json
 temp/
 tmp/
+certs/
