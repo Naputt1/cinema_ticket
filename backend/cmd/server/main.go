@@ -74,6 +74,7 @@ func main() {
 	bookingUsecase := usecase.NewBookingUsecase(bookingRepo, seatRepo, showtimeRepo, movieRepo, lockRepo, rmqPublisher, auditRepo)
 	adminUsecase := usecase.NewAdminUsecase(bookingRepo, showtimeRepo, movieRepo, seatRepo, userRepo, auditRepo)
 	sseHandler := handler.NewSSEHandler()
+	healthHandler := handler.NewHealthHandler()
 
 	// RabbitMQ consumer for SSE bridge
 	sseConsumer, err := events.NewRabbitMQConsumer(
@@ -125,6 +126,7 @@ func main() {
 		Booking: handler.NewBookingHandler(bookingUsecase),
 		Admin:   handler.NewAdminHandler(adminUsecase),
 		SSE:     sseHandler,
+		Health:  healthHandler,
 	}, cfg.JWT.Secret, cfg.App.FrontendURL)
 
 	srv := &http.Server{

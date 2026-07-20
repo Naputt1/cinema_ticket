@@ -17,6 +17,7 @@ type Handlers struct {
 	Booking *handler.BookingHandler
 	Admin   *handler.AdminHandler
 	SSE     *handler.SSEHandler
+	Health  *handler.HealthHandler
 }
 
 func Setup(r *gin.Engine, h *Handlers, jwtSecret string, frontendURL string) {
@@ -33,6 +34,7 @@ func Setup(r *gin.Engine, h *Handlers, jwtSecret string, frontendURL string) {
 
 	api := r.Group("/api/v1")
 
+	api.GET("/health", h.Health.Health)
 	api.GET("/auth/google/login", h.Auth.GoogleLogin)
 	api.GET("/auth/google/callback", h.Auth.GoogleCallback)
 	api.POST("/auth/refresh", h.Auth.RefreshToken)
