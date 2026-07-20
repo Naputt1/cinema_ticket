@@ -107,6 +107,15 @@ function seatLabel(s: { row: string; number: number }) {
   return `${s.row}${s.number}`
 }
 
+async function forceCancelBooking(id: string) {
+  if (!confirm('Cancel this booking?')) return
+  await fetch(`${API}/admin/bookings/${id}/cancel`, {
+    method: 'POST',
+    credentials: 'include',
+  })
+  bkRefetch()
+}
+
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString()
 }
@@ -205,11 +214,20 @@ async function deleteMovie(id: string) {
         <div v-for="b in (bookings as any[])" :key="b.id" class="border rounded p-3 text-sm">
           <div class="flex justify-between items-center mb-1">
             <span class="font-medium">{{ b.movie?.title }}</span>
-            <span
-              class="text-xs font-medium px-2 py-0.5 rounded"
-              :class="b.status === 'BOOKED' ? 'text-green-700 bg-green-50' : b.status === 'LOCKED' ? 'text-yellow-700 bg-yellow-50' : 'text-red-700 bg-red-50'"
-            >
-              {{ b.status }}
+            <span class="flex items-center gap-2">
+              <span
+                class="text-xs font-medium px-2 py-0.5 rounded"
+                :class="b.status === 'BOOKED' ? 'text-green-700 bg-green-50' : b.status === 'LOCKED' ? 'text-yellow-700 bg-yellow-50' : 'text-red-700 bg-red-50'"
+              >
+                {{ b.status }}
+              </span>
+              <button
+                v-if="b.status === 'LOCKED' || b.status === 'BOOKED'"
+                @click="forceCancelBooking(b.id)"
+                class="text-red-500 underline text-xs ml-2"
+              >
+                Cancel
+              </button>
             </span>
           </div>
           <p class="text-muted-foreground">
