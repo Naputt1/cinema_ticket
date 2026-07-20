@@ -18,6 +18,19 @@ func NewUserRepository(db *mongo.Database) domain.UserRepository {
 	}
 }
 
+func (r *userRepository) FindAll(ctx context.Context) ([]domain.User, error) {
+	cursor, err := r.coll.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+	var users []domain.User
+	if err := cursor.All(ctx, &users); err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func (r *userRepository) Create(ctx context.Context, user *domain.User) error {
 	_, err := r.coll.InsertOne(ctx, user)
 	return err
