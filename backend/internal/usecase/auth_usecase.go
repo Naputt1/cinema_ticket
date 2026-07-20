@@ -199,3 +199,7 @@ func (uc *AuthUsecase) GetUserByID(ctx context.Context, id string) (*domain.User
 func (uc *AuthUsecase) GetAccessExpiry() time.Duration {
 	return uc.cfg.JWT.AccessExpiry
 }
+
+func (uc *AuthUsecase) IsProduction() bool {
+	return uc.cfg.App.Production
+}
