@@ -23,7 +23,7 @@ const queryClient = useQueryClient()
 
 const cancelMutation = useMutation({
   mutationFn: async () => {
-    const res = await fetch(`${API}/bookings/${route.params.id}/cancel`, {
+    const res = await fetch(`${API}/bookings/${route.params.id}/refund`, {
       method: 'POST',
       credentials: 'include',
     })
@@ -126,7 +126,7 @@ function imgError(e: Event) {
             {{ booking.status }}
           </span>
           <button
-            v-if="booking.status === 'LOCKED'"
+            v-if="booking.status === 'LOCKED' || booking.status === 'BOOKED'"
             @click="cancelMutation.mutate()"
             :disabled="cancelMutation.isPending.value"
             class="text-sm px-3 py-1 border border-destructive text-destructive rounded hover:bg-destructive/5 disabled:opacity-50"

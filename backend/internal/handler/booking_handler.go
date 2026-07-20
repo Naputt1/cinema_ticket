@@ -119,6 +119,17 @@ func (h *BookingHandler) CancelBooking(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "booking cancelled"})
 }
 
+// RefundBooking cancels a BOOKED or LOCKED booking.
+func (h *BookingHandler) RefundBooking(c *gin.Context) {
+	userID := c.GetString("user_id")
+	bookingID := c.Param("id")
+	if err := h.bookingUsecase.RefundBooking(c.Request.Context(), userID, bookingID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "booking cancelled"})
+}
+
 // GetMyBookings returns current user's bookings.
 // @Summary Get user bookings
 // @Tags booking
