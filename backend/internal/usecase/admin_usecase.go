@@ -17,6 +17,7 @@ type AdminUsecase struct {
 	seatRepo     domain.SeatRepository
 	userRepo     domain.UserRepository
 	auditRepo    domain.AuditLogRepository
+	lockRepo     RedisLockRepo
 }
 
 func NewAdminUsecase(
@@ -26,6 +27,7 @@ func NewAdminUsecase(
 	seatRepo domain.SeatRepository,
 	userRepo domain.UserRepository,
 	auditRepo domain.AuditLogRepository,
+	lockRepo RedisLockRepo,
 ) *AdminUsecase {
 	return &AdminUsecase{
 		bookingRepo:  bookingRepo,
@@ -34,6 +36,7 @@ func NewAdminUsecase(
 		seatRepo:     seatRepo,
 		userRepo:     userRepo,
 		auditRepo:    auditRepo,
+		lockRepo:     lockRepo,
 	}
 }
 
@@ -190,4 +193,31 @@ func (uc *AdminUsecase) GetAuditLogs(ctx context.Context, eventType string) ([]d
 		f["event_type"] = eventType
 	}
 	return uc.auditRepo.FindAll(ctx, f)
+}
+
+func (uc *AdminUsecase) ForceCancelBooking(ctx context.Context, bookingID string) error {
+	booking, err := uc.bookingRepo.FindByID(ctx, bookingID)
+	if err != nil {
+		return fmt.Errorf("failed to find booking: %w", err)
+	}
+	if booking == nil {
+		return fmt.Errorf("booking not found")
+	}
+	if booking.Status != domain.BookingStatusLocked && booking.Status != domain.BookingStatusBooked {
+		return fmt.Errorf("booking cannot be cancelled")
+	}
+	booking.Status = domain.BookingStatusCancelled
+	booking.ExpiresAt = nil
+	booking.UpdatedAt = time.Now()
+	if err := uc.bookingRepo.Update(ctx, booking); err != nil {
+		return fmt.Errorf("failed to update booking: %w", err)
+	}
+	if err := uc.seatRepo.BulkUpdateStatus(ctx, booking.SeatIDs, domain.SeatStatusAvailable); err != nil {
+		return fmt.Errorf("failed to release seats: %w", err)
+	}
+	for _, seatID := range booking.SeatIDs {
+		lockKey := fmt.Sprintf("lock:seat:%s:%s", booking.ShowtimeID, seatID)
+		uc.lockRepo.Release(ctx, lockKey, "admin")
+	}
+	return nil
 }

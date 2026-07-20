@@ -77,7 +77,11 @@ func Setup(r *gin.Engine, h *Handlers, jwtSecret string, frontendURL string) {
 		admin.POST("/movies/:id/showtimes", h.Admin.CreateShowtime)
 		admin.PUT("/showtimes/:id", h.Admin.UpdateShowtime)
 		admin.DELETE("/showtimes/:id", h.Admin.DeleteShowtime)
+<<<<<<< HEAD
 		admin.GET("/users", h.Admin.GetUsers)
 		admin.PUT("/users/:id/role", h.Admin.UpdateUserRole)
+=======
+		admin.POST("/bookings/:id/cancel", h.Admin.ForceCancelBooking)
+>>>>>>> feature/admin-force-cancel
 	}
 }

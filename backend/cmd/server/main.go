@@ -72,7 +72,7 @@ func main() {
 	authUsecase := usecase.NewAuthUsecase(userRepo, cfg)
 	movieUsecase := usecase.NewMovieUsecase(movieRepo, showtimeRepo, seatRepo)
 	bookingUsecase := usecase.NewBookingUsecase(bookingRepo, seatRepo, showtimeRepo, movieRepo, lockRepo, rmqPublisher, auditRepo)
-	adminUsecase := usecase.NewAdminUsecase(bookingRepo, showtimeRepo, movieRepo, seatRepo, userRepo, auditRepo)
+	adminUsecase := usecase.NewAdminUsecase(bookingRepo, showtimeRepo, movieRepo, seatRepo, userRepo, auditRepo, lockRepo)
 	sseHandler := handler.NewSSEHandler()
 	healthHandler := handler.NewHealthHandler()
 

@@ -197,3 +197,12 @@ func (h *AdminHandler) DeleteShowtime(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "deleted"})
 }
+
+func (h *AdminHandler) ForceCancelBooking(c *gin.Context) {
+	bookingID := c.Param("id")
+	if err := h.adminUsecase.ForceCancelBooking(c.Request.Context(), bookingID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "booking cancelled"})
+}
