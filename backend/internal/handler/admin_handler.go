@@ -157,6 +157,38 @@ func (h *AdminHandler) UpdateShowtime(c *gin.Context) {
 	c.JSON(http.StatusOK, st)
 }
 
+func (h *AdminHandler) GetUsers(c *gin.Context) {
+	users, err := h.adminUsecase.GetAllUsers(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, users)
+}
+
+type updateRoleReq struct {
+	Role string `json:"role" binding:"required"`
+}
+
+func (h *AdminHandler) UpdateUserRole(c *gin.Context) {
+	userID := c.Param("id")
+	var req updateRoleReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	role := domain.Role(req.Role)
+	if role != domain.RoleUser && role != domain.RoleAdmin {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid role"})
+		return
+	}
+	if err := h.adminUsecase.UpdateUserRole(c.Request.Context(), userID, role); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "role updated"})
+}
+
 func (h *AdminHandler) DeleteShowtime(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.adminUsecase.DeleteShowtime(c.Request.Context(), id); err != nil {

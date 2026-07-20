@@ -167,6 +167,23 @@ func (uc *AdminUsecase) DeleteShowtime(ctx context.Context, id string) error {
 	return uc.showtimeRepo.Delete(ctx, id)
 }
 
+func (uc *AdminUsecase) GetAllUsers(ctx context.Context) ([]domain.User, error) {
+	return uc.userRepo.FindAll(ctx)
+}
+
+func (uc *AdminUsecase) UpdateUserRole(ctx context.Context, userID string, role domain.Role) error {
+	user, err := uc.userRepo.FindByID(ctx, userID)
+	if err != nil {
+		return fmt.Errorf("failed to find user: %w", err)
+	}
+	if user == nil {
+		return fmt.Errorf("user not found")
+	}
+	user.Role = role
+	user.UpdatedAt = time.Now()
+	return uc.userRepo.Update(ctx, user)
+}
+
 func (uc *AdminUsecase) GetAuditLogs(ctx context.Context, eventType string) ([]domain.AuditLog, error) {
 	f := bson.M{}
 	if eventType != "" {
