@@ -7,6 +7,7 @@ import (
 	"github.com/naputt/cinema-ticket-backend/internal/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type bookingRepository struct {
@@ -48,7 +49,16 @@ func (r *bookingRepository) FindByUserID(ctx context.Context, userID string) ([]
 }
 
 func (r *bookingRepository) FindAll(ctx context.Context, filter map[string]interface{}) ([]domain.Booking, error) {
-	cursor, err := r.coll.Find(ctx, filter)
+	opts := options.Find()
+	if skip, ok := filter["$skip"]; ok {
+		opts.SetSkip(int64(skip.(int)))
+		delete(filter, "$skip")
+	}
+	if limit, ok := filter["$limit"]; ok {
+		opts.SetLimit(int64(limit.(int)))
+		delete(filter, "$limit")
+	}
+	cursor, err := r.coll.Find(ctx, filter, opts)
 	if err != nil {
 		return nil, err
 	}
