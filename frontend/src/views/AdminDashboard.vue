@@ -156,11 +156,6 @@ function formatPrice(price: number) {
   return price?.toFixed(2)
 }
 
-function movieTitleForShowtime(st: any) {
-  const m = (movies.value as any[] || []).find(m => m.id === st.movie_id)
-  return m?.title || st.movie_id?.slice(0, 8)
-}
-
 function openCreateMovie() {
   editingMovie.value = null
   movieForm.value = { title: '', description: '', genre: '', duration: 60, poster_url: '' }
@@ -395,14 +390,8 @@ async function deleteMovie(id: string) {
       <div v-else class="space-y-2">
         <div v-for="st in showtimes" :key="st.id" class="border rounded p-3 text-sm flex items-center justify-between">
           <div>
-<<<<<<< HEAD
-            <p class="font-medium">{{ movieTitleForShowtime(st) }}</p>
+            <p class="font-medium">{{ st.movie_title || movieTitleForShowtime(st) }}</p>
             <p class="text-muted-foreground text-xs">{{ st.screen }} · {{ formatSTDateTime(st.start_time) }} · ${{ st.price?.toFixed(2) }}</p>
-=======
-            <p class="font-medium">{{ st.screen }}</p>
-            <p class="text-muted-foreground">{{ formatSTDateTime(st.start_time) }} · ${{ st.price?.toFixed(2) }}</p>
-            <p class="text-xs text-muted-foreground">{{ st.movie_title || movieTitleForShowtime(st) }}</p>
->>>>>>> feature/showtime-enrich
           </div>
           <div class="flex gap-2">
             <button @click="openEditShowtime(st)" class="text-xs px-2 py-1 border rounded hover:bg-accent">Edit</button>

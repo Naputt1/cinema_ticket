@@ -51,15 +51,10 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	}
 
 	expiry := int(h.authUsecase.GetAccessExpiry().Seconds())
-<<<<<<< HEAD
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("access_token", accessToken, expiry, "/", "", h.authUsecase.IsProduction(), true)
-=======
 	refreshExpiry := int(h.authUsecase.GetRefreshExpiry().Seconds())
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("access_token", accessToken, expiry, "/", "", h.authUsecase.IsProduction(), true)
 	c.SetCookie("refresh_token", refreshToken, refreshExpiry, "/", "", h.authUsecase.IsProduction(), true)
->>>>>>> feature/refresh-cookie
 
 	c.JSON(http.StatusOK, gin.H{
 		"access_token":  accessToken,

@@ -49,11 +49,8 @@ type JWTConfig struct {
 type AppConfig struct {
 	FrontendURL string
 	AdminEmails []string
-<<<<<<< HEAD
 	Production  bool
-=======
 	Env         string
->>>>>>> feature/refresh-cookie
 }
 
 func Load() (*Config, error) {
@@ -113,11 +110,8 @@ func Load() (*Config, error) {
 		App: AppConfig{
 			FrontendURL: v.GetString("FRONTEND_URL"),
 			AdminEmails: adminEmails,
-<<<<<<< HEAD
 			Production:  v.GetBool("PRODUCTION"),
-=======
 			Env:         v.GetString("APP_ENV"),
->>>>>>> feature/refresh-cookie
 		},
 	}, nil
 }
