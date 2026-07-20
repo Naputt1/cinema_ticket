@@ -51,7 +51,8 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	}
 
 	expiry := int(h.authUsecase.GetAccessExpiry().Seconds())
-	c.SetCookie("access_token", accessToken, expiry, "/", "", false, true)
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("access_token", accessToken, expiry, "/", "", h.authUsecase.IsProduction(), true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"access_token":  accessToken,
@@ -82,7 +83,8 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	}
 
 	expiry := int(h.authUsecase.GetAccessExpiry().Seconds())
-	c.SetCookie("access_token", accessToken, expiry, "/", "", false, true)
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("access_token", accessToken, expiry, "/", "", h.authUsecase.IsProduction(), true)
 
 	c.JSON(http.StatusOK, gin.H{"access_token": accessToken})
 }
@@ -93,7 +95,8 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 // @Success 200 {object} map[string]string
 // @Router /api/v1/auth/logout [get]
 func (h *AuthHandler) Logout(c *gin.Context) {
-	c.SetCookie("access_token", "", -1, "/", "", false, true)
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("access_token", "", -1, "/", "", h.authUsecase.IsProduction(), true)
 	c.JSON(http.StatusOK, gin.H{"message": "logged out"})
 }
 
