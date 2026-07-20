@@ -51,7 +51,10 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	}
 
 	expiry := int(h.authUsecase.GetAccessExpiry().Seconds())
-	c.SetCookie("access_token", accessToken, expiry, "/", "", false, true)
+	refreshExpiry := int(h.authUsecase.GetRefreshExpiry().Seconds())
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("access_token", accessToken, expiry, "/", "", h.authUsecase.IsProduction(), true)
+	c.SetCookie("refresh_token", refreshToken, refreshExpiry, "/", "", h.authUsecase.IsProduction(), true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"access_token":  accessToken,
@@ -67,22 +70,27 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 // @Success 200 {object} map[string]string
 // @Router /api/v1/auth/refresh [post]
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
-	var req struct {
-		RefreshToken string `json:"refresh_token" binding:"required"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing refresh_token"})
-		return
+	refreshTokenStr, _ := c.Cookie("refresh_token")
+	if refreshTokenStr == "" {
+		var req struct {
+			RefreshToken string `json:"refresh_token" binding:"required"`
+		}
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "missing refresh_token"})
+			return
+		}
+		refreshTokenStr = req.RefreshToken
 	}
 
-	accessToken, err := h.authUsecase.RefreshAccessToken(c.Request.Context(), req.RefreshToken)
+	accessToken, err := h.authUsecase.RefreshAccessToken(c.Request.Context(), refreshTokenStr)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid refresh token"})
 		return
 	}
 
 	expiry := int(h.authUsecase.GetAccessExpiry().Seconds())
-	c.SetCookie("access_token", accessToken, expiry, "/", "", false, true)
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("access_token", accessToken, expiry, "/", "", h.authUsecase.IsProduction(), true)
 
 	c.JSON(http.StatusOK, gin.H{"access_token": accessToken})
 }
