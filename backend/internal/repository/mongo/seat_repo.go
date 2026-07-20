@@ -74,6 +74,11 @@ func (r *seatRepository) UpdateStatus(ctx context.Context, id string, status dom
 	return err
 }
 
+func (r *seatRepository) DeleteByShowtimeID(ctx context.Context, showtimeID string) error {
+	_, err := r.coll.DeleteMany(ctx, bson.M{"showtime_id": showtimeID})
+	return err
+}
+
 func (r *seatRepository) BulkUpdateStatus(ctx context.Context, ids []string, status domain.SeatStatus) error {
 	_, err := r.coll.UpdateMany(ctx, bson.M{"_id": bson.M{"$in": ids}}, bson.M{"$set": bson.M{"status": status}})
 	return err

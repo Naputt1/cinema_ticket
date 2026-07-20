@@ -72,6 +72,11 @@ func (r *bookingRepository) Update(ctx context.Context, booking *domain.Booking)
 	return err
 }
 
+func (r *bookingRepository) DeleteByShowtimeID(ctx context.Context, showtimeID string) error {
+	_, err := r.coll.DeleteMany(ctx, bson.M{"showtime_id": showtimeID})
+	return err
+}
+
 func (r *bookingRepository) FindExpiredLocked(ctx context.Context, now time.Time) ([]domain.Booking, error) {
 	cursor, err := r.coll.Find(ctx, bson.M{
 		"status":     domain.BookingStatusLocked,

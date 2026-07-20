@@ -38,6 +38,7 @@ type SeatRepository interface {
 	FindByID(ctx context.Context, id string) (*Seat, error)
 	UpdateStatus(ctx context.Context, id string, status SeatStatus) error
 	BulkUpdateStatus(ctx context.Context, ids []string, status SeatStatus) error
+	DeleteByShowtimeID(ctx context.Context, showtimeID string) error
 }
 
 type BookingRepository interface {
@@ -48,6 +49,7 @@ type BookingRepository interface {
 	UpdateStatus(ctx context.Context, id string, status BookingStatus) error
 	Update(ctx context.Context, booking *Booking) error
 	FindExpiredLocked(ctx context.Context, now time.Time) ([]Booking, error)
+	DeleteByShowtimeID(ctx context.Context, showtimeID string) error
 }
 
 type AuditLogRepository interface {
