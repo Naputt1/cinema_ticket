@@ -49,7 +49,11 @@ type JWTConfig struct {
 type AppConfig struct {
 	FrontendURL string
 	AdminEmails []string
+<<<<<<< HEAD
 	Production  bool
+=======
+	Env         string
+>>>>>>> feature/refresh-cookie
 }
 
 func Load() (*Config, error) {
@@ -68,6 +72,7 @@ func Load() (*Config, error) {
 	v.SetDefault("JWT_ACCESS_EXPIRY", "15m")
 	v.SetDefault("JWT_REFRESH_EXPIRY", "168h")
 	v.SetDefault("FRONTEND_URL", "http://localhost:5173")
+	v.SetDefault("APP_ENV", "development")
 	v.SetDefault("ADMIN_EMAILS", "")
 	v.SetDefault("PRODUCTION", false)
 
@@ -108,7 +113,11 @@ func Load() (*Config, error) {
 		App: AppConfig{
 			FrontendURL: v.GetString("FRONTEND_URL"),
 			AdminEmails: adminEmails,
+<<<<<<< HEAD
 			Production:  v.GetBool("PRODUCTION"),
+=======
+			Env:         v.GetString("APP_ENV"),
+>>>>>>> feature/refresh-cookie
 		},
 	}, nil
 }

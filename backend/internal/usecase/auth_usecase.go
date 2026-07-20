@@ -200,6 +200,15 @@ func (uc *AuthUsecase) GetAccessExpiry() time.Duration {
 	return uc.cfg.JWT.AccessExpiry
 }
 
+<<<<<<< HEAD
 func (uc *AuthUsecase) IsProduction() bool {
 	return uc.cfg.App.Production
+=======
+func (uc *AuthUsecase) GetRefreshExpiry() time.Duration {
+	return uc.cfg.JWT.RefreshExpiry
+}
+
+func (uc *AuthUsecase) IsProduction() bool {
+	return uc.cfg.App.Env == "production"
+>>>>>>> feature/refresh-cookie
 }
