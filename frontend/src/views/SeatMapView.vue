@@ -105,6 +105,19 @@ const cancelMutation = useMutation({
   },
 });
 
+const extendMutation = useMutation({
+  mutationFn: async () => {
+    const res = await fetch(`${API}/bookings/${booking.currentBookingId}/extend`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+    if (!res.ok) throw new Error('Extend failed')
+  },
+  onSuccess: () => {
+    startCountdown(new Date(Date.now() + 5 * 60 * 1000).toISOString())
+  },
+})
+
 function getSeatStatus(
   seat: any,
 ): "AVAILABLE" | "LOCKED" | "BOOKED" | "SELECTED" {
@@ -269,6 +282,14 @@ onUnmounted(() => {
         Selected: {{ selectedSeatLabels.join(", ") || "None" }}
       </p>
       <div class="flex gap-2">
+        <button
+          v-if="booking.currentBookingId"
+          @click="extendMutation.mutate()"
+          class="px-4 py-2 border rounded text-sm hover:bg-muted"
+          :disabled="extendMutation.isPending.value"
+        >
+          {{ extendMutation.isPending.value ? 'Extending...' : 'Extend 5 min' }}
+        </button>
         <button
           v-if="booking.currentBookingId"
           @click="cancelMutation.mutate()"

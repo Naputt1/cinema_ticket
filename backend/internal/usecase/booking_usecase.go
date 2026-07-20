@@ -14,6 +14,7 @@ import (
 type RedisLockRepo interface {
 	Acquire(ctx context.Context, key string, value string, ttl time.Duration) (bool, error)
 	Release(ctx context.Context, key string, value string) (bool, error)
+	Extend(ctx context.Context, key string, value string, ttl time.Duration) (bool, error)
 }
 
 type BookingUsecase struct {
@@ -104,6 +105,34 @@ func (uc *BookingUsecase) LockSeat(ctx context.Context, userID string, showtimeI
 	})
 
 	return booking, nil
+}
+
+func (uc *BookingUsecase) ExtendLock(ctx context.Context, userID string, bookingID string) error {
+	booking, err := uc.bookingRepo.FindByID(ctx, bookingID)
+	if err != nil {
+		return fmt.Errorf("failed to find booking: %w", err)
+	}
+	if booking == nil {
+		return fmt.Errorf("booking not found")
+	}
+	if booking.UserID != userID {
+		return fmt.Errorf("booking does not belong to user")
+	}
+	if booking.Status != domain.BookingStatusLocked {
+		return fmt.Errorf("booking is not in locked state")
+	}
+
+	newExpiry := time.Now().Add(5 * time.Minute)
+	for _, seatID := range booking.SeatIDs {
+		lockKey := fmt.Sprintf("lock:seat:%s:%s", booking.ShowtimeID, seatID)
+		if _, err := uc.lockRepo.Extend(ctx, lockKey, userID, 5*time.Minute); err != nil {
+			return fmt.Errorf("failed to extend lock for seat %s: %w", seatID, err)
+		}
+	}
+
+	booking.ExpiresAt = &newExpiry
+	booking.UpdatedAt = time.Now()
+	return uc.bookingRepo.Update(ctx, booking)
 }
 
 func (uc *BookingUsecase) PayBooking(ctx context.Context, userID string, bookingID string) (*domain.Booking, error) {
