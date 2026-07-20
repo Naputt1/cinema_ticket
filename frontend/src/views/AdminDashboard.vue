@@ -127,6 +127,10 @@ async function deleteShowtime(id: string) {
   stRefetch()
 }
 
+function movieTitleForShowtime(st: any) {
+  return `Movie ID: ${st.movie_id}`
+}
+
 function formatSTDateTime(iso: string) {
   return new Date(iso).toLocaleString()
 }
@@ -391,8 +395,14 @@ async function deleteMovie(id: string) {
       <div v-else class="space-y-2">
         <div v-for="st in showtimes" :key="st.id" class="border rounded p-3 text-sm flex items-center justify-between">
           <div>
+<<<<<<< HEAD
             <p class="font-medium">{{ movieTitleForShowtime(st) }}</p>
             <p class="text-muted-foreground text-xs">{{ st.screen }} · {{ formatSTDateTime(st.start_time) }} · ${{ st.price?.toFixed(2) }}</p>
+=======
+            <p class="font-medium">{{ st.screen }}</p>
+            <p class="text-muted-foreground">{{ formatSTDateTime(st.start_time) }} · ${{ st.price?.toFixed(2) }}</p>
+            <p class="text-xs text-muted-foreground">{{ st.movie_title || movieTitleForShowtime(st) }}</p>
+>>>>>>> feature/showtime-enrich
           </div>
           <div class="flex gap-2">
             <button @click="openEditShowtime(st)" class="text-xs px-2 py-1 border rounded hover:bg-accent">Edit</button>

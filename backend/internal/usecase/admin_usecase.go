@@ -144,8 +144,30 @@ func (uc *AdminUsecase) DeleteMovie(ctx context.Context, id string) error {
 	return uc.movieRepo.Delete(ctx, id)
 }
 
-func (uc *AdminUsecase) GetAllShowtimes(ctx context.Context) ([]domain.Showtime, error) {
-	return uc.showtimeRepo.FindAll(ctx)
+func (uc *AdminUsecase) GetAllShowtimes(ctx context.Context) ([]domain.ShowtimeDetail, error) {
+	showtimes, err := uc.showtimeRepo.FindAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+	details := make([]domain.ShowtimeDetail, 0, len(showtimes))
+	for _, st := range showtimes {
+		movie, _ := uc.movieRepo.FindByID(ctx, st.MovieID)
+		movieTitle := ""
+		if movie != nil {
+			movieTitle = movie.Title
+		}
+		details = append(details, domain.ShowtimeDetail{
+			ID:         st.ID,
+			MovieID:    st.MovieID,
+			MovieTitle: movieTitle,
+			Screen:     st.Screen,
+			StartTime:  st.StartTime,
+			EndTime:    st.EndTime,
+			Price:      st.Price,
+			UpdatedAt:  st.UpdatedAt,
+		})
+	}
+	return details, nil
 }
 
 func (uc *AdminUsecase) CreateShowtime(ctx context.Context, movieID string, st *domain.Showtime) error {
