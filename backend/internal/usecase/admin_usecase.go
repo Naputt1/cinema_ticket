@@ -149,6 +149,12 @@ func (uc *AdminUsecase) UpdateShowtime(ctx context.Context, st *domain.Showtime)
 }
 
 func (uc *AdminUsecase) DeleteShowtime(ctx context.Context, id string) error {
+	if err := uc.bookingRepo.DeleteByShowtimeID(ctx, id); err != nil {
+		return fmt.Errorf("failed to delete bookings: %w", err)
+	}
+	if err := uc.seatRepo.DeleteByShowtimeID(ctx, id); err != nil {
+		return fmt.Errorf("failed to delete seats: %w", err)
+	}
 	return uc.showtimeRepo.Delete(ctx, id)
 }
 
