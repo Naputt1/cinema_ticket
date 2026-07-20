@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Naputt1/fog/main/fog.schema.json",
+  "service": [
+    {
+      "path": "backend",
+      "cmd": "air"
+    },
+    {
+      "path": "frontend",
+      "cmd": "pnpm  dev",
+      "ws": true
+    }
+  ]
+}
