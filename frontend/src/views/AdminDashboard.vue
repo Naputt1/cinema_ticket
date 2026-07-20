@@ -9,10 +9,13 @@ const showMovieModal = ref(false)
 const editingMovie = ref<any>(null)
 const movieForm = ref({ title: '', description: '', genre: '', duration: 60, poster_url: '' })
 
+const bookingPage = ref(0)
+const bookingLimit = ref(20)
+
 const { data: bookings, isLoading: bkLoading, isError: bkError, refetch: bkRefetch } = useQuery({
-  queryKey: ['admin-bookings'],
+  queryKey: ['admin-bookings', bookingPage, bookingLimit],
   queryFn: async () => {
-    const res = await fetch(`${API}/admin/bookings`, { credentials: 'include' })
+    const res = await fetch(`${API}/admin/bookings?skip=${bookingPage.value * bookingLimit.value}&limit=${bookingLimit.value}`, { credentials: 'include' })
     if (!res.ok) throw new Error('Failed to fetch bookings')
     return res.json()
   },
@@ -223,6 +226,23 @@ async function deleteMovie(id: string) {
             <span class="ml-2">${{ formatPrice(b.showtime?.price) }} × {{ b.seats?.length || 0 }}</span>
           </p>
           <p class="text-muted-foreground text-xs mt-1">{{ formatDateTime(b.created_at) }}</p>
+        </div>
+        <div class="flex justify-center gap-4 mt-4">
+          <button
+            @click="bookingPage = Math.max(0, bookingPage - 1)"
+            :disabled="bookingPage === 0"
+            class="px-3 py-1 border rounded text-sm disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span class="text-sm text-muted-foreground self-center">Page {{ bookingPage + 1 }}</span>
+          <button
+            @click="bookingPage++"
+            :disabled="(bookings as any[])?.length < bookingLimit"
+            class="px-3 py-1 border rounded text-sm disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>

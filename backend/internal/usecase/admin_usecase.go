@@ -42,6 +42,8 @@ type BookingFilter struct {
 	Date    string `form:"date"`
 	UserID  string `form:"user_id"`
 	Status  string `form:"status"`
+	Skip    int    `form:"skip"`
+	Limit   int    `form:"limit"`
 }
 
 func (uc *AdminUsecase) GetBookings(ctx context.Context, filter BookingFilter) ([]domain.BookingDetail, error) {
@@ -57,6 +59,13 @@ func (uc *AdminUsecase) GetBookings(ctx context.Context, filter BookingFilter) (
 	}
 	if filter.Date != "" {
 		f["created_at"] = bson.M{"$regex": filter.Date, "$options": "i"}
+	}
+
+	if filter.Skip > 0 {
+		f["$skip"] = filter.Skip
+	}
+	if filter.Limit > 0 {
+		f["$limit"] = filter.Limit
 	}
 
 	bookings, err := uc.bookingRepo.FindAll(ctx, f)

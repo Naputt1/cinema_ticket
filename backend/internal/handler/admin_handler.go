@@ -26,6 +26,8 @@ func NewAdminHandler(adminUsecase *usecase.AdminUsecase) *AdminHandler {
 // @Param date query string false "Filter by date"
 // @Param user_id query string false "Filter by user ID"
 // @Param status query string false "Filter by status"
+// @Param skip query int false "Number of records to skip"
+// @Param limit query int false "Max records to return"
 // @Success 200 {array} domain.Booking
 // @Router /api/v1/admin/bookings [get]
 func (h *AdminHandler) GetBookings(c *gin.Context) {
