@@ -180,6 +180,24 @@ func (uc *BookingUsecase) CancelBooking(ctx context.Context, userID string, book
 	return uc.releaseBooking(ctx, booking, domain.BookingStatusCancelled, domain.AuditEventSeatReleased)
 }
 
+func (uc *BookingUsecase) RefundBooking(ctx context.Context, userID string, bookingID string) error {
+	booking, err := uc.bookingRepo.FindByID(ctx, bookingID)
+	if err != nil {
+		return fmt.Errorf("failed to find booking: %w", err)
+	}
+	if booking == nil {
+		return fmt.Errorf("booking not found")
+	}
+	if booking.UserID != userID {
+		return fmt.Errorf("booking does not belong to user")
+	}
+	if booking.Status != domain.BookingStatusLocked && booking.Status != domain.BookingStatusBooked {
+		return fmt.Errorf("booking cannot be cancelled")
+	}
+
+	return uc.releaseBooking(ctx, booking, domain.BookingStatusCancelled, domain.AuditEventSeatReleased)
+}
+
 func (uc *BookingUsecase) releaseBooking(ctx context.Context, booking *domain.Booking, newStatus domain.BookingStatus, auditEvent domain.AuditEventType) error {
 	booking.Status = newStatus
 	booking.ExpiresAt = nil

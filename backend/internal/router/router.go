@@ -55,6 +55,7 @@ func Setup(r *gin.Engine, h *Handlers, jwtSecret string, frontendURL string) {
 		auth.POST("/bookings/cancel", h.Booking.CancelBooking)
 		auth.GET("/bookings/my", h.Booking.GetMyBookings)
 		auth.POST("/bookings/:id/cancel", h.Booking.CancelMyBooking)
+		auth.POST("/bookings/:id/refund", h.Booking.RefundBooking)
 		auth.GET("/bookings/:id", h.Booking.GetBooking)
 
 		auth.GET("/events/seats", h.SSE.SeatUpdates)
