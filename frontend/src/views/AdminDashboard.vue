@@ -38,6 +38,7 @@ const { data: movies, isLoading: moviesLoading, isError: moviesError, refetch: m
 
 const showShowtimeModal = ref(false)
 const editingShowtime = ref<any>(null)
+const selectedShowtimeMovieId = ref('')
 const showtimeForm = ref({ screen: '', start_time: '', price: 12 })
 
 const { data: showtimes, isLoading: stLoading, isError: stError, refetch: stRefetch } = useQuery({
@@ -51,6 +52,7 @@ const { data: showtimes, isLoading: stLoading, isError: stError, refetch: stRefe
 
 function openCreateShowtime() {
   editingShowtime.value = null
+  selectedShowtimeMovieId.value = ''
   showtimeForm.value = { screen: '', start_time: '', price: 12 }
   showShowtimeModal.value = true
 }
@@ -80,9 +82,11 @@ async function saveShowtime() {
       body: JSON.stringify(body),
     })
   } else {
-    const movieId = prompt('Movie ID:')
-    if (!movieId) return
-    await fetch(`${API}/admin/movies/${movieId}/showtimes`, {
+    if (!selectedShowtimeMovieId.value) {
+      alert('Please select a movie')
+      return
+    }
+    await fetch(`${API}/admin/movies/${selectedShowtimeMovieId.value}/showtimes`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -90,6 +94,7 @@ async function saveShowtime() {
     })
   }
   showShowtimeModal.value = false
+  selectedShowtimeMovieId.value = ''
   stRefetch()
 }
 
@@ -113,6 +118,11 @@ function formatDateTime(iso: string) {
 
 function formatPrice(price: number) {
   return price?.toFixed(2)
+}
+
+function movieTitleForShowtime(st: any) {
+  const m = (movies.value as any[] || []).find(m => m.id === st.movie_id)
+  return m?.title || st.movie_id?.slice(0, 8)
 }
 
 function openCreateMovie() {
@@ -316,9 +326,8 @@ async function deleteMovie(id: string) {
       <div v-else class="space-y-2">
         <div v-for="st in showtimes" :key="st.id" class="border rounded p-3 text-sm flex items-center justify-between">
           <div>
-            <p class="font-medium">{{ st.screen }}</p>
-            <p class="text-muted-foreground">{{ formatSTDateTime(st.start_time) }} · ${{ st.price?.toFixed(2) }}</p>
-            <p class="text-xs text-muted-foreground">Movie ID: {{ st.movie_id }}</p>
+            <p class="font-medium">{{ movieTitleForShowtime(st) }}</p>
+            <p class="text-muted-foreground text-xs">{{ st.screen }} · {{ formatSTDateTime(st.start_time) }} · ${{ st.price?.toFixed(2) }}</p>
           </div>
           <div class="flex gap-2">
             <button @click="openEditShowtime(st)" class="text-xs px-2 py-1 border rounded hover:bg-accent">Edit</button>
@@ -350,6 +359,10 @@ async function deleteMovie(id: string) {
     <div class="bg-background rounded-lg p-6 w-full max-w-md">
       <h2 class="text-lg font-bold mb-4">{{ editingShowtime ? 'Edit Showtime' : 'Add Showtime' }}</h2>
       <div class="space-y-3">
+        <select v-model="selectedShowtimeMovieId" class="w-full px-3 py-2 border rounded text-sm">
+          <option value="">Select movie...</option>
+          <option v-for="m in (movies as any[] || [])" :key="m.id" :value="m.id">{{ m.title }}</option>
+        </select>
         <input v-model="showtimeForm.screen" placeholder="Screen (e.g. Screen 1)" class="w-full px-3 py-2 border rounded text-sm" />
         <input v-model="showtimeForm.start_time" type="datetime-local" class="w-full px-3 py-2 border rounded text-sm" />
         <input v-model="showtimeForm.price" type="number" step="0.01" placeholder="Price" class="w-full px-3 py-2 border rounded text-sm" />
