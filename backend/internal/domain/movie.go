@@ -21,3 +21,14 @@ type Showtime struct {
 	Price     float64   `json:"price" bson:"price"`
 	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
 }
+
+type ShowtimeDetail struct {
+	ID         string    `json:"id"`
+	MovieID    string    `json:"movie_id"`
+	MovieTitle string    `json:"movie_title"`
+	Screen     string    `json:"screen"`
+	StartTime  time.Time `json:"start_time"`
+	EndTime    time.Time `json:"end_time"`
+	Price      float64   `json:"price"`
+	UpdatedAt  time.Time `json:"updated_at"`
+}

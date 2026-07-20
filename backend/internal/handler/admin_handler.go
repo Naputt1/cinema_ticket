@@ -106,6 +106,11 @@ func (h *AdminHandler) DeleteMovie(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "deleted"})
 }
 
+// @Summary List all showtimes
+// @Tags admin
+// @Produce json
+// @Success 200 {array} domain.ShowtimeDetail
+// @Router /api/v1/admin/showtimes [get]
 func (h *AdminHandler) GetShowtimes(c *gin.Context) {
 	showtimes, err := h.adminUsecase.GetAllShowtimes(c.Request.Context())
 	if err != nil {
