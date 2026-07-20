@@ -79,6 +79,16 @@ func (h *BookingHandler) PayBooking(c *gin.Context) {
 	c.JSON(http.StatusOK, booking)
 }
 
+func (h *BookingHandler) ExtendLock(c *gin.Context) {
+	userID := c.GetString("user_id")
+	bookingID := c.Param("id")
+	if err := h.bookingUsecase.ExtendLock(c.Request.Context(), userID, bookingID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "lock extended"})
+}
+
 // CancelMyBooking cancels a booking by ID (for LOCKED bookings only).
 func (h *BookingHandler) CancelMyBooking(c *gin.Context) {
 	userID := c.GetString("user_id")
