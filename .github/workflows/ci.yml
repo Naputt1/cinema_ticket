@@ -51,6 +51,10 @@ jobs:
           go-version: 'stable'
           cache-dependency-path: backend/go.sum
 
+      - name: Download dependencies
+        run: go mod download
+        working-directory: backend
+
       - name: Build
         run: go build ./...
         working-directory: backend
