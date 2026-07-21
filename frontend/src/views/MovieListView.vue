@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const API = import.meta.env.VITE_API_URL || '/api/v1'
 
@@ -58,42 +63,31 @@ function imgError(e: Event) {
   <div>
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
       <h1 class="text-3xl font-bold">Now Showing</h1>
-      <input
-        v-model="search"
-        type="text"
-        placeholder="Search movies..."
-        class="w-full sm:w-64 px-3 py-2 border rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-      />
+      <Input v-model="search" type="text" placeholder="Search movies..." class="w-full sm:w-64" />
     </div>
 
     <div class="flex flex-wrap gap-2 mb-6">
-      <button
-        @click="selectedGenre = ''"
-        class="px-3 py-1.5 text-sm rounded-full border transition-colors"
-        :class="selectedGenre === '' ? 'bg-primary text-primary-foreground border-primary' : 'hover:bg-accent'"
-      >
-        All
-      </button>
-      <button
+      <Badge :variant="selectedGenre === '' ? 'default' : 'outline'" class="cursor-pointer" @click="selectedGenre = ''">All</Badge>
+      <Badge
         v-for="g in genres"
         :key="g"
+        :variant="selectedGenre === g ? 'default' : 'outline'"
+        class="cursor-pointer"
         @click="selectedGenre = g"
-        class="px-3 py-1.5 text-sm rounded-full border transition-colors"
-        :class="selectedGenre === g ? 'bg-primary text-primary-foreground border-primary' : 'hover:bg-accent'"
       >
         {{ g }}
-      </button>
+      </Badge>
     </div>
 
     <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-      <div v-for="i in 8" :key="i" class="border rounded-lg overflow-hidden animate-pulse">
-        <div class="w-full h-64 bg-muted" />
+      <div v-for="i in 8" :key="i" class="border rounded-lg overflow-hidden">
+        <Skeleton class="w-full h-64 rounded-none" />
         <div class="p-4 space-y-3">
-          <div class="h-5 bg-muted rounded w-3/4" />
-          <div class="h-4 bg-muted rounded w-1/2" />
-          <div class="h-4 bg-muted rounded w-full" />
-          <div class="h-4 bg-muted rounded w-2/3" />
-          <div class="h-9 bg-muted rounded w-32" />
+          <Skeleton class="h-5 w-3/4" />
+          <Skeleton class="h-4 w-1/2" />
+          <Skeleton class="h-4 w-full" />
+          <Skeleton class="h-4 w-2/3" />
+          <Skeleton class="h-9 w-32" />
         </div>
       </div>
     </div>
@@ -101,7 +95,7 @@ function imgError(e: Event) {
     <div v-else-if="isError" class="text-center py-16">
       <p class="text-lg text-destructive mb-2">Failed to load movies</p>
       <p class="text-sm text-muted-foreground mb-4">Check that the backend is running.</p>
-      <button @click="refetch()" class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:opacity-90">Retry</button>
+      <Button @click="refetch()">Retry</Button>
     </div>
 
     <div v-else-if="filtered.length === 0" class="text-center py-16">
@@ -110,10 +104,10 @@ function imgError(e: Event) {
     </div>
 
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-      <div
+      <Card
         v-for="movie in filtered"
         :key="movie.id"
-        class="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-card flex flex-col"
+        class="flex flex-col overflow-hidden"
       >
         <div class="relative">
           <img :src="movie.poster_url" :alt="movie.title" class="w-full h-64 object-cover" @error="imgError" />
@@ -124,23 +118,22 @@ function imgError(e: Event) {
         <div class="p-4 flex flex-col flex-1">
           <div class="flex items-start justify-between gap-2 mb-1">
             <h2 class="font-bold text-lg leading-tight">{{ movie.title }}</h2>
-            <span class="shrink-0 text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
+            <Badge variant="secondary">
               {{ movie.genre }}
-            </span>
+            </Badge>
           </div>
           <p class="text-xs text-muted-foreground mb-2">{{ formatDuration(movie.duration) }}</p>
           <p class="text-sm text-muted-foreground line-clamp-2 mb-4">{{ movie.description }}</p>
-          <router-link
-            :to="`/movies/${movie.id}`"
-            class="mt-auto inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:opacity-90 self-start"
-          >
-            Select Showtime
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
+          <router-link :to="`/movies/${movie.id}`">
+            <Button size="default" class="mt-auto self-start">
+              Select Showtime
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </Button>
           </router-link>
         </div>
-      </div>
+      </Card>
     </div>
   </div>
 </template>

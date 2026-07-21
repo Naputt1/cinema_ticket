@@ -16,8 +16,15 @@
     "check": "pnpm typecheck && pnpm lint && pnpm format:check"
   },
   "dependencies": {
+    "@lucide/vue": "^1.25.0",
     "@tanstack/vue-query": "^5.56.0",
+    "@tanstack/vue-table": "^8.21.3",
+    "@vueuse/core": "^14.3.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "pinia": "^2.2.2",
+    "reka-ui": "^2.10.1",
+    "tailwind-merge": "^3.6.0",
     "vue": "^3.5.4",
     "vue-router": "^4.4.3",
     "vue-sonner": "^1.2.0"
