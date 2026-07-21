@@ -3,7 +3,12 @@ import { useQuery } from '@tanstack/vue-query'
 
 const API = import.meta.env.VITE_API_URL || '/api/v1'
 
-const { data: logs, isLoading, isError, refetch } = useQuery({
+const {
+  data: logs,
+  isLoading,
+  isError,
+  refetch,
+} = useQuery({
   queryKey: ['admin-audit-logs'],
   queryFn: async () => {
     const res = await fetch(`${API}/admin/audit-logs`, { credentials: 'include' })
@@ -33,12 +38,10 @@ function formatDateTime(iso: string) {
       <button @click="refetch()" class="px-4 py-2 rounded text-sm border">Retry</button>
     </div>
 
-    <div v-else-if="!(logs as any[])?.length" class="text-center py-8 text-muted-foreground">
-      No audit logs found
-    </div>
+    <div v-else-if="!(logs as any[])?.length" class="text-center py-8 text-muted-foreground">No audit logs found</div>
 
     <div v-else class="space-y-2">
-      <div v-for="log in (logs as any[])" :key="log.id" class="border rounded p-3 text-sm">
+      <div v-for="log in logs as any[]" :key="log.id" class="border rounded p-3 text-sm">
         <div class="flex justify-between">
           <span class="font-medium">{{ log.event_type }}</span>
           <span class="text-muted-foreground">{{ formatDateTime(log.created_at) }}</span>

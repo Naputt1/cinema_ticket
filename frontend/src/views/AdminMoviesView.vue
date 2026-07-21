@@ -8,7 +8,12 @@ const showMovieModal = ref(false)
 const editingMovie = ref<any>(null)
 const movieForm = ref({ title: '', description: '', genre: '', duration: 60, poster_url: '' })
 
-const { data: movies, isLoading, isError, refetch } = useQuery({
+const {
+  data: movies,
+  isLoading,
+  isError,
+  refetch,
+} = useQuery({
   queryKey: ['admin-movies'],
   queryFn: async () => {
     const res = await fetch(`${API}/admin/movies`, { credentials: 'include' })
@@ -81,7 +86,7 @@ async function deleteMovie(id: string) {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="m in (movies as any[])" :key="m.id" class="border-b">
+        <tr v-for="m in movies as any[]" :key="m.id" class="border-b">
           <td class="py-2">
             <img v-if="m.poster_url" :src="m.poster_url" alt="" class="w-10 h-14 object-cover rounded" />
             <div v-else class="w-10 h-14 bg-muted rounded" />
@@ -111,7 +116,9 @@ async function deleteMovie(id: string) {
         </div>
         <div class="flex justify-end gap-2 mt-4">
           <button @click="showMovieModal = false" class="px-4 py-2 border rounded text-sm">Cancel</button>
-          <button @click="saveMovie" class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm">{{ editingMovie ? 'Update' : 'Create' }}</button>
+          <button @click="saveMovie" class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm">
+            {{ editingMovie ? 'Update' : 'Create' }}
+          </button>
         </div>
       </div>
     </div>

@@ -26,15 +26,18 @@ export const useAuthStore = defineStore('auth', () => {
         const data = JSON.parse(stored)
         refreshToken.value = data.refreshToken
         user.value = data.user
-      } catch { }
+      } catch {}
     }
   }
 
   function saveToStorage() {
-    localStorage.setItem('auth', JSON.stringify({
-      refreshToken: refreshToken.value,
-      user: user.value,
-    }))
+    localStorage.setItem(
+      'auth',
+      JSON.stringify({
+        refreshToken: refreshToken.value,
+        user: user.value,
+      }),
+    )
   }
 
   function clearStorage() {
@@ -49,7 +52,7 @@ export const useAuthStore = defineStore('auth', () => {
         accessToken.value = 'authenticated'
         saveToStorage()
       }
-    } catch { }
+    } catch {}
   }
 
   async function fetchUser() {
@@ -59,7 +62,7 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = await res.json()
         saveToStorage()
       }
-    } catch { }
+    } catch {}
   }
 
   async function handleGoogleCallback(code: string) {
@@ -110,7 +113,7 @@ export const useAuthStore = defineStore('auth', () => {
     clearStorage()
     try {
       await fetch(`${API}/auth/logout`, { credentials: 'include' })
-    } catch { }
+    } catch {}
     window.location.href = '/'
   }
 

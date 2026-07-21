@@ -7,10 +7,17 @@ const API = import.meta.env.VITE_API_URL || '/api/v1'
 const bookingPage = ref(0)
 const bookingLimit = ref(20)
 
-const { data: bookings, isLoading, isError, refetch } = useQuery({
+const {
+  data: bookings,
+  isLoading,
+  isError,
+  refetch,
+} = useQuery({
   queryKey: ['admin-bookings', bookingPage, bookingLimit],
   queryFn: async () => {
-    const res = await fetch(`${API}/admin/bookings?skip=${bookingPage.value * bookingLimit.value}&limit=${bookingLimit.value}`, { credentials: 'include' })
+    const res = await fetch(`${API}/admin/bookings?skip=${bookingPage.value * bookingLimit.value}&limit=${bookingLimit.value}`, {
+      credentials: 'include',
+    })
     if (!res.ok) throw new Error('Failed to fetch bookings')
     return res.json()
   },
@@ -49,18 +56,22 @@ function formatDateTime(iso: string) {
       <button @click="refetch()" class="px-4 py-2 rounded text-sm border">Retry</button>
     </div>
 
-    <div v-else-if="!(bookings as any[])?.length" class="text-center py-8 text-muted-foreground">
-      No bookings found
-    </div>
+    <div v-else-if="!(bookings as any[])?.length" class="text-center py-8 text-muted-foreground">No bookings found</div>
 
     <div v-else class="space-y-2">
-      <div v-for="b in (bookings as any[])" :key="b.id" class="border rounded p-3 text-sm">
+      <div v-for="b in bookings as any[]" :key="b.id" class="border rounded p-3 text-sm">
         <div class="flex justify-between items-center mb-1">
           <span class="font-medium">{{ b.movie?.title }}</span>
           <span class="flex items-center gap-2">
             <span
               class="text-xs font-medium px-2 py-0.5 rounded"
-              :class="b.status === 'BOOKED' ? 'text-green-700 bg-green-50' : b.status === 'LOCKED' ? 'text-yellow-700 bg-yellow-50' : 'text-red-700 bg-red-50'"
+              :class="
+                b.status === 'BOOKED'
+                  ? 'text-green-700 bg-green-50'
+                  : b.status === 'LOCKED'
+                    ? 'text-yellow-700 bg-yellow-50'
+                    : 'text-red-700 bg-red-50'
+              "
             >
               {{ b.status }}
             </span>

@@ -18,7 +18,12 @@ const { data: movies } = useQuery({
   },
 })
 
-const { data: showtimes, isLoading, isError, refetch } = useQuery({
+const {
+  data: showtimes,
+  isLoading,
+  isError,
+  refetch,
+} = useQuery({
   queryKey: ['admin-showtimes'],
   queryFn: async () => {
     const res = await fetch(`${API}/admin/showtimes`, { credentials: 'include' })
@@ -55,7 +60,10 @@ async function saveShowtime() {
       body: JSON.stringify(body),
     })
   } else {
-    if (!selectedShowtimeMovieId.value) { alert('Please select a movie'); return }
+    if (!selectedShowtimeMovieId.value) {
+      alert('Please select a movie')
+      return
+    }
     await fetch(`${API}/admin/movies/${selectedShowtimeMovieId.value}/showtimes`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -111,26 +119,43 @@ function formatSTDateTime(iso: string) {
         </div>
         <div class="flex gap-2">
           <button @click="openEditShowtime(st)" class="text-xs px-2 py-1 border rounded hover:bg-accent">Edit</button>
-          <button @click="deleteShowtime(st.id)" class="text-xs px-2 py-1 border border-destructive text-destructive rounded hover:bg-destructive/5">Delete</button>
+          <button
+            @click="deleteShowtime(st.id)"
+            class="text-xs px-2 py-1 border border-destructive text-destructive rounded hover:bg-destructive/5"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
 
-    <div v-if="showShowtimeModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" @click.self="showShowtimeModal = false">
+    <div
+      v-if="showShowtimeModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      @click.self="showShowtimeModal = false"
+    >
       <div class="bg-background rounded-lg p-6 w-full max-w-md">
         <h2 class="text-lg font-bold mb-4">{{ editingShowtime ? 'Edit Showtime' : 'Add Showtime' }}</h2>
         <div class="space-y-3">
           <select v-model="selectedShowtimeMovieId" class="w-full px-3 py-2 border rounded text-sm">
             <option value="">Select movie...</option>
-            <option v-for="m in (movies as any[] || [])" :key="m.id" :value="m.id">{{ m.title }}</option>
+            <option v-for="m in (movies as any[]) || []" :key="m.id" :value="m.id">{{ m.title }}</option>
           </select>
           <input v-model="showtimeForm.screen" placeholder="Screen (e.g. Screen 1)" class="w-full px-3 py-2 border rounded text-sm" />
           <input v-model="showtimeForm.start_time" type="datetime-local" class="w-full px-3 py-2 border rounded text-sm" />
-          <input v-model="showtimeForm.price" type="number" step="0.01" placeholder="Price" class="w-full px-3 py-2 border rounded text-sm" />
+          <input
+            v-model="showtimeForm.price"
+            type="number"
+            step="0.01"
+            placeholder="Price"
+            class="w-full px-3 py-2 border rounded text-sm"
+          />
         </div>
         <div class="flex justify-end gap-2 mt-4">
           <button @click="showShowtimeModal = false" class="px-4 py-2 border rounded text-sm">Cancel</button>
-          <button @click="saveShowtime" class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm">{{ editingShowtime ? 'Update' : 'Create' }}</button>
+          <button @click="saveShowtime" class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm">
+            {{ editingShowtime ? 'Update' : 'Create' }}
+          </button>
         </div>
       </div>
     </div>

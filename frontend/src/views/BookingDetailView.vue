@@ -7,7 +7,11 @@ const route = useRoute()
 const router = useRouter()
 const API = import.meta.env.VITE_API_URL || '/api/v1'
 
-const { data: booking, isLoading, isError } = useQuery({
+const {
+  data: booking,
+  isLoading,
+  isError,
+} = useQuery({
   queryKey: ['booking', route.params.id],
   queryFn: async () => {
     const res = await fetch(`${API}/bookings/${route.params.id}`, { credentials: 'include' })
@@ -63,10 +67,15 @@ function formatDuration(min: number) {
 
 function statusColor(status: string) {
   switch (status) {
-    case 'BOOKED': return 'text-green-600 border-green-200 bg-green-50'
-    case 'LOCKED': return 'text-yellow-600 border-yellow-200 bg-yellow-50'
-    case 'CANCELLED': case 'EXPIRED': return 'text-red-600 border-red-200 bg-red-50'
-    default: return 'text-muted-foreground border-border'
+    case 'BOOKED':
+      return 'text-green-600 border-green-200 bg-green-50'
+    case 'LOCKED':
+      return 'text-yellow-600 border-yellow-200 bg-yellow-50'
+    case 'CANCELLED':
+    case 'EXPIRED':
+      return 'text-red-600 border-red-200 bg-red-50'
+    default:
+      return 'text-muted-foreground border-border'
   }
 }
 
@@ -119,10 +128,7 @@ function imgError(e: Event) {
       <div class="border rounded-lg divide-y">
         <div class="p-4 flex items-center justify-between">
           <span class="text-sm text-muted-foreground">Status</span>
-          <span
-            class="text-sm font-semibold px-3 py-1 rounded-full border"
-            :class="statusColor(booking.status)"
-          >
+          <span class="text-sm font-semibold px-3 py-1 rounded-full border" :class="statusColor(booking.status)">
             {{ booking.status }}
           </span>
           <button

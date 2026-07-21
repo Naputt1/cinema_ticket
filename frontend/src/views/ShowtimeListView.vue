@@ -5,7 +5,12 @@ import { useQuery } from '@tanstack/vue-query'
 const route = useRoute()
 const API = import.meta.env.VITE_API_URL || '/api/v1'
 
-const { data: movie, isLoading: movieLoading, isError: movieError, refetch: movieRefetch } = useQuery({
+const {
+  data: movie,
+  isLoading: movieLoading,
+  isError: movieError,
+  refetch: movieRefetch,
+} = useQuery({
   queryKey: ['movie', route.params.id],
   queryFn: async () => {
     const res = await fetch(`${API}/movies/${route.params.id}`, { credentials: 'include' })
@@ -14,7 +19,12 @@ const { data: movie, isLoading: movieLoading, isError: movieError, refetch: movi
   },
 })
 
-const { data: showtimes, isLoading: stLoading, isError: stError, refetch: stRefetch } = useQuery({
+const {
+  data: showtimes,
+  isLoading: stLoading,
+  isError: stError,
+  refetch: stRefetch,
+} = useQuery({
   queryKey: ['showtimes', route.params.id],
   queryFn: async () => {
     const res = await fetch(`${API}/movies/${route.params.id}/showtimes`, { credentials: 'include' })
@@ -59,7 +69,10 @@ function formatDate(iso: string) {
       <p class="text-lg text-destructive mb-2">Failed to load</p>
       <p class="text-sm text-muted-foreground mb-4">Could not load showtime information. Check that the backend is running.</p>
       <button
-        @click="movieRefetch(); stRefetch()"
+        @click="
+          movieRefetch()
+          stRefetch()
+        "
         class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:opacity-90"
       >
         Retry
@@ -74,11 +87,7 @@ function formatDate(iso: string) {
     <template v-else>
       <h1 class="text-2xl font-bold mb-6">{{ (movie as any)?.title }} - Showtimes</h1>
       <div class="grid gap-4">
-        <div
-          v-for="st in (showtimes as any[] || [])"
-          :key="st.id"
-          class="border rounded-lg p-4 flex items-center justify-between"
-        >
+        <div v-for="st in (showtimes as any[]) || []" :key="st.id" class="border rounded-lg p-4 flex items-center justify-between">
           <div>
             <p class="font-medium">{{ st.screen }}</p>
             <p class="text-sm text-muted-foreground">{{ formatDate(st.start_time) }} at {{ formatTime(st.start_time) }}</p>

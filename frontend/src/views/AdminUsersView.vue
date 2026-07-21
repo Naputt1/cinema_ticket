@@ -3,7 +3,12 @@ import { useQuery } from '@tanstack/vue-query'
 
 const API = import.meta.env.VITE_API_URL || '/api/v1'
 
-const { data: users, isLoading, isError, refetch } = useQuery({
+const {
+  data: users,
+  isLoading,
+  isError,
+  refetch,
+} = useQuery({
   queryKey: ['admin-users'],
   queryFn: async () => {
     const res = await fetch(`${API}/admin/users`, { credentials: 'include' })
@@ -49,11 +54,14 @@ async function toggleUserRole(u: any) {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="u in (users as any[])" :key="u.id" class="border-b">
+        <tr v-for="u in users as any[]" :key="u.id" class="border-b">
           <td class="py-2">{{ u.email }}</td>
           <td class="py-2">{{ u.name }}</td>
           <td class="py-2">
-            <span class="text-xs font-medium px-2 py-0.5 rounded" :class="u.role === 'ADMIN' ? 'text-purple-700 bg-purple-50' : 'text-blue-700 bg-blue-50'">
+            <span
+              class="text-xs font-medium px-2 py-0.5 rounded"
+              :class="u.role === 'ADMIN' ? 'text-purple-700 bg-purple-50' : 'text-blue-700 bg-blue-50'"
+            >
               {{ u.role }}
             </span>
           </td>

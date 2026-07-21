@@ -3,7 +3,12 @@ import { useQuery } from '@tanstack/vue-query'
 
 const API = import.meta.env.VITE_API_URL || '/api/v1'
 
-const { data: bookings, isLoading, isError, refetch } = useQuery({
+const {
+  data: bookings,
+  isLoading,
+  isError,
+  refetch,
+} = useQuery({
   queryKey: ['my-bookings'],
   queryFn: async () => {
     const res = await fetch(`${API}/bookings/my`, { credentials: 'include' })
@@ -22,10 +27,15 @@ function formatDateTime(iso: string) {
 
 function statusColor(status: string) {
   switch (status) {
-    case 'BOOKED': return 'text-green-600 border-green-200 bg-green-50'
-    case 'LOCKED': return 'text-yellow-600 border-yellow-200 bg-yellow-50'
-    case 'CANCELLED': case 'EXPIRED': return 'text-red-600 border-red-200 bg-red-50'
-    default: return 'text-muted-foreground border-border'
+    case 'BOOKED':
+      return 'text-green-600 border-green-200 bg-green-50'
+    case 'LOCKED':
+      return 'text-yellow-600 border-yellow-200 bg-yellow-50'
+    case 'CANCELLED':
+    case 'EXPIRED':
+      return 'text-red-600 border-red-200 bg-red-50'
+    default:
+      return 'text-muted-foreground border-border'
   }
 }
 
@@ -65,33 +75,21 @@ function imgError(e: Event) {
 
     <div v-else class="space-y-4">
       <router-link
-        v-for="b in (bookings as any[])"
+        v-for="b in bookings as any[]"
         :key="b.id"
         :to="`/bookings/${b.id}`"
         class="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-card flex flex-col sm:flex-row"
       >
-        <img
-          :src="b.movie?.poster_url"
-          :alt="b.movie?.title"
-          class="w-full sm:w-24 h-32 sm:h-28 object-cover shrink-0"
-          @error="imgError"
-        />
+        <img :src="b.movie?.poster_url" :alt="b.movie?.title" class="w-full sm:w-24 h-32 sm:h-28 object-cover shrink-0" @error="imgError" />
         <div class="p-4 flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div class="space-y-1">
             <h2 class="font-bold">{{ b.movie?.title }}</h2>
-            <p class="text-sm text-muted-foreground">
-              {{ b.showtime?.screen }} · {{ formatDateTime(b.showtime?.start_time) }}
-            </p>
-            <p class="text-sm text-muted-foreground">
-              Seats: {{ b.seats?.map(seatLabel).join(', ') }}
-            </p>
+            <p class="text-sm text-muted-foreground">{{ b.showtime?.screen }} · {{ formatDateTime(b.showtime?.start_time) }}</p>
+            <p class="text-sm text-muted-foreground">Seats: {{ b.seats?.map(seatLabel).join(', ') }}</p>
           </div>
           <div class="flex items-center gap-3">
             <span class="text-sm font-semibold">${{ b.total_amount?.toFixed(2) }}</span>
-            <span
-              class="text-xs font-medium px-2.5 py-1 rounded-full border"
-              :class="statusColor(b.status)"
-            >
+            <span class="text-xs font-medium px-2.5 py-1 rounded-full border" :class="statusColor(b.status)">
               {{ b.status }}
             </span>
           </div>

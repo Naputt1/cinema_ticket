@@ -31,12 +31,24 @@ useSSE()
     <div class="flex">
       <aside v-if="route.path.startsWith('/admin')" class="w-48 border-r min-h-[calc(100vh-57px)] p-4 shrink-0 flex flex-col gap-1">
         <div class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Admin</div>
-        <router-link to="/admin" class="px-3 py-2 rounded text-sm hover:bg-accent" active-class="bg-accent font-medium">Dashboard</router-link>
-        <router-link to="/admin/bookings" class="px-3 py-2 rounded text-sm hover:bg-accent" active-class="bg-accent font-medium">Bookings</router-link>
-        <router-link to="/admin/logs" class="px-3 py-2 rounded text-sm hover:bg-accent" active-class="bg-accent font-medium">Audit Logs</router-link>
-        <router-link to="/admin/movies" class="px-3 py-2 rounded text-sm hover:bg-accent" active-class="bg-accent font-medium">Movies</router-link>
-        <router-link to="/admin/showtimes" class="px-3 py-2 rounded text-sm hover:bg-accent" active-class="bg-accent font-medium">Showtimes</router-link>
-        <router-link to="/admin/users" class="px-3 py-2 rounded text-sm hover:bg-accent" active-class="bg-accent font-medium">Users</router-link>
+        <router-link to="/admin" class="px-3 py-2 rounded text-sm hover:bg-accent" active-class="bg-accent font-medium"
+          >Dashboard</router-link
+        >
+        <router-link to="/admin/bookings" class="px-3 py-2 rounded text-sm hover:bg-accent" active-class="bg-accent font-medium"
+          >Bookings</router-link
+        >
+        <router-link to="/admin/logs" class="px-3 py-2 rounded text-sm hover:bg-accent" active-class="bg-accent font-medium"
+          >Audit Logs</router-link
+        >
+        <router-link to="/admin/movies" class="px-3 py-2 rounded text-sm hover:bg-accent" active-class="bg-accent font-medium"
+          >Movies</router-link
+        >
+        <router-link to="/admin/showtimes" class="px-3 py-2 rounded text-sm hover:bg-accent" active-class="bg-accent font-medium"
+          >Showtimes</router-link
+        >
+        <router-link to="/admin/users" class="px-3 py-2 rounded text-sm hover:bg-accent" active-class="bg-accent font-medium"
+          >Users</router-link
+        >
       </aside>
       <main class="container mx-auto p-4 flex-1">
         <router-view />

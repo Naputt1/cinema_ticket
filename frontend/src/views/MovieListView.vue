@@ -7,7 +7,12 @@ const API = import.meta.env.VITE_API_URL || '/api/v1'
 const search = ref('')
 const selectedGenre = ref('')
 
-const { data: movies, isLoading, isError, refetch } = useQuery({
+const {
+  data: movies,
+  isLoading,
+  isError,
+  refetch,
+} = useQuery({
   queryKey: ['movies'],
   queryFn: async () => {
     const res = await fetch(`${API}/movies`, { credentials: 'include' })
@@ -17,12 +22,12 @@ const { data: movies, isLoading, isError, refetch } = useQuery({
 })
 
 const genres = computed(() => {
-  const all = (movies.value as any[] || []).map(m => m.genre).filter(Boolean)
+  const all = ((movies.value as any[]) || []).map((m) => m.genre).filter(Boolean)
   return [...new Set(all)] as string[]
 })
 
 const filtered = computed(() => {
-  const list = (movies.value as any[] || []).filter(m => {
+  const list = ((movies.value as any[]) || []).filter((m) => {
     if (search.value) {
       const q = search.value.toLowerCase()
       if (!m.title?.toLowerCase().includes(q)) return false
@@ -96,12 +101,7 @@ function imgError(e: Event) {
     <div v-else-if="isError" class="text-center py-16">
       <p class="text-lg text-destructive mb-2">Failed to load movies</p>
       <p class="text-sm text-muted-foreground mb-4">Check that the backend is running.</p>
-      <button
-        @click="refetch()"
-        class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:opacity-90"
-      >
-        Retry
-      </button>
+      <button @click="refetch()" class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:opacity-90">Retry</button>
     </div>
 
     <div v-else-if="filtered.length === 0" class="text-center py-16">
@@ -116,15 +116,8 @@ function imgError(e: Event) {
         class="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-card flex flex-col"
       >
         <div class="relative">
-          <img
-            :src="movie.poster_url"
-            :alt="movie.title"
-            class="w-full h-64 object-cover"
-            @error="imgError"
-          />
-          <div
-            class="hidden absolute inset-0 items-center justify-center bg-muted text-muted-foreground text-sm"
-          >
+          <img :src="movie.poster_url" :alt="movie.title" class="w-full h-64 object-cover" @error="imgError" />
+          <div class="hidden absolute inset-0 items-center justify-center bg-muted text-muted-foreground text-sm">
             {{ movie.title?.[0] }}
           </div>
         </div>
