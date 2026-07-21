@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery, useMutation } from '@tanstack/vue-query'
 import { useAuthStore } from '../stores/auth'
@@ -190,7 +192,7 @@ onUnmounted(() => {
 
     <div v-if="isLoading" class="border rounded-lg p-6 mb-6">
       <div class="text-center mb-6">
-        <div class="w-3/4 h-2 bg-gray-200 rounded mx-auto mb-2"></div>
+        <Skeleton class="w-3/4 h-2 mx-auto mb-2" />
         <p class="text-xs text-muted-foreground">SCREEN</p>
       </div>
       <div class="flex flex-col justify-center gap-6">
@@ -198,7 +200,9 @@ onUnmounted(() => {
           <div class="flex flex-row gap-2 items-center">
             <span class="text-xs font-bold text-gray-300">{{ String.fromCharCode(64 + r) }}</span>
             <div class="flex gap-1">
-              <div v-for="c in 8" :key="c" class="w-8 h-8 bg-gray-200 rounded animate-pulse"></div>
+              <div v-for="c in 8" :key="c">
+                <Skeleton class="w-8 h-8" />
+              </div>
             </div>
           </div>
         </div>
@@ -207,7 +211,7 @@ onUnmounted(() => {
 
     <div v-else-if="isError" class="border rounded-lg p-6 mb-6 text-center">
       <p class="text-destructive mb-4">Failed to load seats</p>
-      <button @click="refetchSeats()" class="px-4 py-2 border rounded text-sm hover:bg-muted">Retry</button>
+      <Button @click="refetchSeats()">Retry</Button>
     </div>
 
     <div v-else-if="!seats || seats.length === 0" class="border rounded-lg p-6 mb-6 text-center">

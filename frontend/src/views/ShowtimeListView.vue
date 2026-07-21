@@ -76,7 +76,7 @@ function formatDate(iso: string) {
     <div v-else-if="movieError || stError" class="text-center py-16">
       <p class="text-lg text-destructive mb-2">Failed to load</p>
       <p class="text-sm text-muted-foreground mb-4">Could not load showtime information. Check that the backend is running.</p>
-      <Button @click="movieRefetch(); stRefetch()">Retry</Button>
+      <Button @click="retryAll">Retry</Button>
     </div>
 
     <div v-else-if="(showtimes as any[])?.length === 0" class="text-center py-16">

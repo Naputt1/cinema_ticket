@@ -89,15 +89,15 @@ function imgError(e: Event) {
   <div>
     <button @click="router.back()" class="text-sm text-muted-foreground hover:underline mb-4 inline-block">&larr; Back</button>
 
-    <div v-if="isLoading" class="animate-pulse space-y-4">
+    <div v-if="isLoading" class="space-y-4">
       <div class="flex gap-6">
-        <div class="w-48 h-72 bg-muted rounded-lg shrink-0" />
+        <Skeleton class="w-48 h-72 shrink-0 rounded-lg" />
         <div class="flex-1 space-y-3">
-          <div class="h-8 bg-muted rounded w-1/2" />
-          <div class="h-5 bg-muted rounded w-1/3" />
-          <div class="h-5 bg-muted rounded w-1/4" />
-          <div class="h-5 bg-muted rounded w-1/4" />
-          <div class="h-5 bg-muted rounded w-1/4" />
+          <Skeleton class="h-8 w-1/2" />
+          <Skeleton class="h-5 w-1/3" />
+          <Skeleton class="h-5 w-1/4" />
+          <Skeleton class="h-5 w-1/4" />
+          <Skeleton class="h-5 w-1/4" />
         </div>
       </div>
     </div>
@@ -105,8 +105,8 @@ function imgError(e: Event) {
     <div v-else-if="isError" class="text-center py-16">
       <p class="text-lg text-destructive mb-2">Booking not found</p>
       <p class="text-sm text-muted-foreground mb-4">This booking may have been removed or the link is invalid.</p>
-      <router-link to="/bookings" class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:opacity-90 inline-block">
-        My Bookings
+      <router-link to="/bookings">
+        <Button>My Bookings</Button>
       </router-link>
     </div>
 
@@ -125,48 +125,55 @@ function imgError(e: Event) {
         </div>
       </div>
 
-      <div class="border rounded-lg divide-y">
+      <Card>
         <div class="p-4 flex items-center justify-between">
           <span class="text-sm text-muted-foreground">Status</span>
           <span class="text-sm font-semibold px-3 py-1 rounded-full border" :class="statusColor(booking.status)">
             {{ booking.status }}
           </span>
-          <button
+          <Button
             v-if="booking.status === 'LOCKED' || booking.status === 'BOOKED'"
+            variant="destructive"
+            size="sm"
             @click="cancelMutation.mutate()"
             :disabled="cancelMutation.isPending.value"
-            class="text-sm px-3 py-1 border border-destructive text-destructive rounded hover:bg-destructive/5 disabled:opacity-50"
           >
             {{ cancelMutation.isPending.value ? 'Cancelling...' : 'Cancel Booking' }}
-          </button>
+          </Button>
         </div>
+        <Separator />
         <div class="p-4 flex items-center justify-between">
           <span class="text-sm text-muted-foreground">Screen</span>
           <span class="text-sm font-medium">{{ booking.showtime?.screen }}</span>
         </div>
+        <Separator />
         <div class="p-4 flex items-center justify-between">
           <span class="text-sm text-muted-foreground">Date</span>
           <span class="text-sm font-medium">{{ formatDate(booking.showtime?.start_time) }}</span>
         </div>
+        <Separator />
         <div class="p-4 flex items-center justify-between">
           <span class="text-sm text-muted-foreground">Time</span>
           <span class="text-sm font-medium">{{ formatTime(booking.showtime?.start_time) }}</span>
         </div>
+        <Separator />
         <div class="p-4 flex items-center justify-between">
           <span class="text-sm text-muted-foreground">Seats ({{ booking.seats?.length }} × ${{ booking.price?.toFixed(2) }})</span>
           <div class="text-right">
             <p v-for="s in booking.seats" :key="s.id" class="text-sm font-medium">{{ seatLabel(s) }}</p>
           </div>
         </div>
+        <Separator />
         <div class="p-4 flex items-center justify-between bg-muted/50">
           <span class="text-sm font-semibold">Total</span>
           <span class="text-lg font-bold">${{ booking.total_amount?.toFixed(2) }}</span>
         </div>
+        <Separator />
         <div class="p-4 flex items-center justify-between">
           <span class="text-sm text-muted-foreground">Booked on</span>
           <span class="text-sm text-muted-foreground">{{ new Date(booking.created_at).toLocaleString() }}</span>
         </div>
-      </div>
+      </Card>
     </div>
   </div>
 </template>
