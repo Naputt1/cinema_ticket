@@ -49,7 +49,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: 'stable'
-          cache-dependency-path: backend/go.sum
+          cache: false
 
       - name: Download dependencies
         run: go mod download
