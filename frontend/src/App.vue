@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { useSSE } from './composables/useSSE'
+import { Button } from '@/components/ui/button'
 
 const route = useRoute()
 const auth = useAuthStore()
@@ -23,7 +24,7 @@ useSSE()
         <router-link to="/bookings" class="text-sm hover:underline" v-if="auth.isAuthenticated">My Bookings</router-link>
         <template v-if="auth.isAuthenticated">
           <span class="text-sm text-muted-foreground">{{ auth.user?.name }}</span>
-          <button @click="auth.logout()" class="text-sm text-destructive hover:underline">Logout</button>
+          <Button variant="destructive" size="sm" @click="auth.logout()">Logout</Button>
         </template>
         <router-link v-else to="/login" class="text-sm hover:underline">Login</router-link>
       </div>

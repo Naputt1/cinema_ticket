@@ -3,6 +3,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
@@ -69,20 +70,6 @@ function formatDuration(min: number) {
   return `${h}h ${m}m`
 }
 
-function statusColor(status: string) {
-  switch (status) {
-    case 'BOOKED':
-      return 'text-green-600 border-green-200 bg-green-50'
-    case 'LOCKED':
-      return 'text-yellow-600 border-yellow-200 bg-yellow-50'
-    case 'CANCELLED':
-    case 'EXPIRED':
-      return 'text-red-600 border-red-200 bg-red-50'
-    default:
-      return 'text-muted-foreground border-border'
-  }
-}
-
 function imgError(e: Event) {
   const el = e.target as HTMLImageElement
   el.style.display = 'none'
@@ -91,7 +78,7 @@ function imgError(e: Event) {
 
 <template>
   <div>
-    <button @click="router.back()" class="text-sm text-muted-foreground hover:underline mb-4 inline-block">&larr; Back</button>
+    <Button variant="link" class="p-0 text-muted-foreground mb-4" @click="router.back()">&larr; Back</Button>
 
     <div v-if="isLoading" class="space-y-4">
       <div class="flex gap-6">
@@ -132,9 +119,7 @@ function imgError(e: Event) {
       <Card>
         <div class="p-4 flex items-center justify-between">
           <span class="text-sm text-muted-foreground">Status</span>
-          <span class="text-sm font-semibold px-3 py-1 rounded-full border" :class="statusColor(booking.status)">
-            {{ booking.status }}
-          </span>
+          <Badge :variant="booking.status === 'BOOKED' ? 'default' : booking.status === 'LOCKED' ? 'secondary' : 'destructive'">{{ booking.status }}</Badge>
           <Button
             v-if="booking.status === 'LOCKED' || booking.status === 'BOOKED'"
             variant="destructive"

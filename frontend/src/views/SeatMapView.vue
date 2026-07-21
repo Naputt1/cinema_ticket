@@ -303,13 +303,8 @@ onUnmounted(() => {
         >
           {{ lockedMutation.isPending.value ? 'Locking...' : 'Lock Seats' }}
         </Button>
-        <router-link
-          v-else
-          :to="'/login?redirect=/showtimes/' + route.params.id"
-        >
-          <Button size="sm">
-            Login to Book
-          </Button>
+        <router-link v-else :to="'/login?redirect=/showtimes/' + route.params.id">
+          <Button size="sm"> Login to Book </Button>
         </router-link>
       </div>
     </div>

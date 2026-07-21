@@ -64,13 +64,14 @@ function imgError(e: Event) {
     </div>
 
     <div v-else class="space-y-4">
-      <router-link
-        v-for="b in bookings as any[]"
-        :key="b.id"
-        :to="`/bookings/${b.id}`"
-      >
+      <router-link v-for="b in bookings as any[]" :key="b.id" :to="`/bookings/${b.id}`">
         <Card class="flex flex-col sm:flex-row overflow-hidden hover:shadow-lg transition-shadow">
-          <img :src="b.movie?.poster_url" :alt="b.movie?.title" class="w-full sm:w-24 h-32 sm:h-28 object-cover shrink-0" @error="imgError" />
+          <img
+            :src="b.movie?.poster_url"
+            :alt="b.movie?.title"
+            class="w-full sm:w-24 h-32 sm:h-28 object-cover shrink-0"
+            @error="imgError"
+          />
           <div class="p-4 flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div class="space-y-1">
               <h2 class="font-bold">{{ b.movie?.title }}</h2>
@@ -79,7 +80,9 @@ function imgError(e: Event) {
             </div>
             <div class="flex items-center gap-3">
               <span class="text-sm font-semibold">${{ b.total_amount?.toFixed(2) }}</span>
-              <Badge :variant="b.status === 'BOOKED' ? 'default' : b.status === 'LOCKED' ? 'secondary' : 'destructive'">{{ b.status }}</Badge>
+              <Badge :variant="b.status === 'BOOKED' ? 'default' : b.status === 'LOCKED' ? 'secondary' : 'destructive'">{{
+                b.status
+              }}</Badge>
             </div>
           </div>
         </Card>

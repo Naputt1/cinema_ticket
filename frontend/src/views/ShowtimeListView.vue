@@ -95,9 +95,7 @@ function formatDate(iso: string) {
           <div class="text-right">
             <p class="font-bold">${{ st.price?.toFixed(2) }}</p>
             <router-link :to="`/showtimes/${st.id}`">
-              <Button size="sm">
-                Select Seats
-              </Button>
+              <Button size="sm"> Select Seats </Button>
             </router-link>
           </div>
         </Card>

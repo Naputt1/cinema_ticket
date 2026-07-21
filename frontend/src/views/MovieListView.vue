@@ -104,11 +104,7 @@ function imgError(e: Event) {
     </div>
 
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-      <Card
-        v-for="movie in filtered"
-        :key="movie.id"
-        class="flex flex-col overflow-hidden"
-      >
+      <Card v-for="movie in filtered" :key="movie.id" class="flex flex-col overflow-hidden">
         <div class="relative">
           <img :src="movie.poster_url" :alt="movie.title" class="w-full h-64 object-cover" @error="imgError" />
           <div class="hidden absolute inset-0 items-center justify-center bg-muted text-muted-foreground text-sm">

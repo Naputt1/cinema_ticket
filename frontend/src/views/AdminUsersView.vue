@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
+import { Button } from '@/components/ui/button'
 
 const API = import.meta.env.VITE_API_URL || '/api/v1'
 
@@ -39,7 +40,7 @@ async function toggleUserRole(u: any) {
 
     <div v-else-if="isError" class="text-center py-8">
       <p class="text-destructive mb-3">Failed to load users</p>
-      <button @click="refetch()" class="px-4 py-2 rounded text-sm border">Retry</button>
+      <Button variant="outline" @click="refetch()">Retry</Button>
     </div>
 
     <div v-else-if="!users?.length" class="text-center py-8 text-muted-foreground">No users found.</div>
@@ -66,9 +67,9 @@ async function toggleUserRole(u: any) {
             </span>
           </td>
           <td class="py-2">
-            <button @click="toggleUserRole(u)" class="text-primary underline text-xs">
+            <Button variant="outline" size="xs" @click="toggleUserRole(u)">
               {{ u.role === 'ADMIN' ? 'Remove Admin' : 'Make Admin' }}
-            </button>
+            </Button>
           </td>
         </tr>
       </tbody>

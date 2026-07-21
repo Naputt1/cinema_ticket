@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
+import { Button } from '@/components/ui/button'
 
 const API = import.meta.env.VITE_API_URL || '/api/v1'
 
@@ -53,7 +54,7 @@ function formatDateTime(iso: string) {
 
     <div v-else-if="isError" class="text-center py-8">
       <p class="text-destructive mb-3">Failed to load bookings</p>
-      <button @click="refetch()" class="px-4 py-2 rounded text-sm border">Retry</button>
+      <Button variant="outline" @click="refetch()">Retry</Button>
     </div>
 
     <div v-else-if="!(bookings as any[])?.length" class="text-center py-8 text-muted-foreground">No bookings found</div>
