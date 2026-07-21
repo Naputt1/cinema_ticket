@@ -79,15 +79,10 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-<<<<<<< HEAD
-      - "5173:80"
-    restart: unless-stopped
-=======
       - "443:443"
       - "80:80"
     volumes:
       - ./certs:/etc/nginx/certs:ro
->>>>>>> feature/tls
     environment:
       VITE_API_URL: /api/v1
     depends_on:
