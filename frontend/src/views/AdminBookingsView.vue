@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 const API = import.meta.env.VITE_API_URL || '/api/v1'
@@ -64,25 +65,12 @@ function formatDateTime(iso: string) {
         <div class="flex justify-between items-center mb-1">
           <span class="font-medium">{{ b.movie?.title }}</span>
           <span class="flex items-center gap-2">
-            <span
-              class="text-xs font-medium px-2 py-0.5 rounded"
-              :class="
-                b.status === 'BOOKED'
-                  ? 'text-green-700 bg-green-50'
-                  : b.status === 'LOCKED'
-                    ? 'text-yellow-700 bg-yellow-50'
-                    : 'text-red-700 bg-red-50'
-              "
-            >
+            <Badge :variant="b.status === 'BOOKED' ? 'default' : b.status === 'LOCKED' ? 'secondary' : 'destructive'">
               {{ b.status }}
-            </span>
-            <button
-              v-if="b.status === 'LOCKED' || b.status === 'BOOKED'"
-              @click="forceCancelBooking(b.id)"
-              class="text-red-500 underline text-xs ml-2"
-            >
+            </Badge>
+            <Button v-if="b.status === 'LOCKED' || b.status === 'BOOKED'" variant="destructive" size="xs" @click="forceCancelBooking(b.id)">
               Cancel
-            </button>
+            </Button>
           </span>
         </div>
         <p class="text-muted-foreground">{{ b.showtime?.screen }} · {{ formatDateTime(b.showtime?.start_time) }}</p>
@@ -95,21 +83,11 @@ function formatDateTime(iso: string) {
       </div>
 
       <div class="flex justify-center gap-4 mt-4">
-        <button
-          @click="bookingPage = Math.max(0, bookingPage - 1)"
-          :disabled="bookingPage === 0"
-          class="px-3 py-1 border rounded text-sm disabled:opacity-50"
-        >
+        <Button variant="outline" size="sm" :disabled="bookingPage === 0" @click="bookingPage = Math.max(0, bookingPage - 1)">
           Previous
-        </button>
+        </Button>
         <span class="text-sm text-muted-foreground self-center">Page {{ bookingPage + 1 }}</span>
-        <button
-          @click="bookingPage++"
-          :disabled="(bookings as any[])?.length < bookingLimit"
-          class="px-3 py-1 border rounded text-sm disabled:opacity-50"
-        >
-          Next
-        </button>
+        <Button variant="outline" size="sm" :disabled="(bookings as any[])?.length < bookingLimit" @click="bookingPage++"> Next </Button>
       </div>
     </div>
   </div>

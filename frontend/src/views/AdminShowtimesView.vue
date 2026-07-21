@@ -4,29 +4,9 @@ import { useQuery } from '@tanstack/vue-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from '@/components/ui/dialog'
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from '@/components/ui/table'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 
 const API = import.meta.env.VITE_API_URL || '/api/v1'
 
@@ -174,7 +154,7 @@ function formatSTDateTime(iso: string) {
               <SelectValue placeholder="Select movie..." />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem v-for="m in (movies as any[] || [])" :key="m.id" :value="m.id">{{ m.title }}</SelectItem>
+              <SelectItem v-for="m in (movies as any[]) || []" :key="m.id" :value="m.id">{{ m.title }}</SelectItem>
             </SelectContent>
           </Select>
           <Input v-model="showtimeForm.screen" placeholder="Screen (e.g. Screen 1)" />

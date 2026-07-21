@@ -119,7 +119,9 @@ function imgError(e: Event) {
       <Card>
         <div class="p-4 flex items-center justify-between">
           <span class="text-sm text-muted-foreground">Status</span>
-          <Badge :variant="booking.status === 'BOOKED' ? 'default' : booking.status === 'LOCKED' ? 'secondary' : 'destructive'">{{ booking.status }}</Badge>
+          <Badge :variant="booking.status === 'BOOKED' ? 'default' : booking.status === 'LOCKED' ? 'secondary' : 'destructive'">{{
+            booking.status
+          }}</Badge>
           <Button
             v-if="booking.status === 'LOCKED' || booking.status === 'BOOKED'"
             variant="destructive"
