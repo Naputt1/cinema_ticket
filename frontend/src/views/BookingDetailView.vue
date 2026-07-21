@@ -2,6 +2,10 @@
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { toast } from 'vue-sonner'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Separator } from '@/components/ui/separator'
 
 const route = useRoute()
 const router = useRouter()

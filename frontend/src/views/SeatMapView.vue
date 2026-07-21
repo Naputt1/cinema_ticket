@@ -267,44 +267,49 @@ onUnmounted(() => {
     <div class="flex justify-between items-center">
       <p class="text-sm text-muted-foreground">Selected: {{ selectedSeatLabels.join(', ') || 'None' }}</p>
       <div class="flex gap-2">
-        <button
+        <Button
           v-if="booking.currentBookingId"
+          variant="outline"
+          size="sm"
           @click="extendMutation.mutate()"
-          class="px-4 py-2 border rounded text-sm hover:bg-muted"
           :disabled="extendMutation.isPending.value"
         >
           {{ extendMutation.isPending.value ? 'Extending...' : 'Extend 5 min' }}
-        </button>
-        <button
+        </Button>
+        <Button
           v-if="booking.currentBookingId"
+          variant="destructive"
+          size="sm"
           @click="cancelMutation.mutate()"
-          class="px-4 py-2 border rounded text-sm hover:bg-muted"
           :disabled="cancelMutation.isPending.value"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           v-if="booking.currentBookingId"
+          variant="default"
+          size="sm"
+          class="bg-green-600 hover:bg-green-700"
           @click="payMutation.mutate()"
-          class="px-4 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700"
           :disabled="payMutation.isPending.value"
         >
           Confirm Payment (Mock)
-        </button>
-        <button
+        </Button>
+        <Button
           v-else-if="auth.isAuthenticated"
+          size="sm"
           @click="handleLock()"
-          class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:opacity-90"
           :disabled="booking.selectedSeats.size === 0 || lockedMutation.isPending.value"
         >
           {{ lockedMutation.isPending.value ? 'Locking...' : 'Lock Seats' }}
-        </button>
+        </Button>
         <router-link
           v-else
-          :to="`/login?redirect=/showtimes/${route.params.id}`"
-          class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:opacity-90 inline-block"
+          :to="'/login?redirect=/showtimes/' + route.params.id"
         >
-          Login to Book
+          <Button size="sm">
+            Login to Book
+          </Button>
         </router-link>
       </div>
     </div>
