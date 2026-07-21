@@ -2,11 +2,13 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/vue-query";
+import { useAuthStore } from "../stores/auth";
 import { useBookingStore } from "../stores/booking";
 import { useSSE } from "../composables/useSSE";
 
 const route = useRoute();
 const router = useRouter();
+const auth = useAuthStore();
 const booking = useBookingStore();
 const sse = useSSE();
 const queryClient = useQueryClient();
@@ -307,7 +309,7 @@ onUnmounted(() => {
           Confirm Payment (Mock)
         </button>
         <button
-          v-else
+          v-else-if="auth.isAuthenticated"
           @click="handleLock()"
           class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:opacity-90"
           :disabled="
@@ -316,6 +318,13 @@ onUnmounted(() => {
         >
           {{ lockedMutation.isPending.value ? "Locking..." : "Lock Seats" }}
         </button>
+        <router-link
+          v-else
+          :to="`/login?redirect=/showtimes/${route.params.id}`"
+          class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:opacity-90 inline-block"
+        >
+          Login to Book
+        </router-link>
       </div>
     </div>
 

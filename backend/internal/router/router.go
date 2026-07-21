@@ -39,16 +39,15 @@ func Setup(r *gin.Engine, h *Handlers, jwtSecret string, frontendURL string) {
 	api.GET("/auth/google/callback", h.Auth.GoogleCallback)
 	api.POST("/auth/refresh", h.Auth.RefreshToken)
 	api.GET("/auth/logout", h.Auth.Logout)
+	api.GET("/movies", h.Movie.GetMovies)
+	api.GET("/movies/:id", h.Movie.GetMovie)
+	api.GET("/movies/:id/showtimes", h.Movie.GetShowtimes)
+	api.GET("/showtimes/:id/seats", h.Movie.GetSeats)
 
 	auth := api.Group("")
 	auth.Use(middleware.AuthMiddleware(jwtSecret))
 	{
 		auth.GET("/auth/me", h.Auth.GetMe)
-
-		auth.GET("/movies", h.Movie.GetMovies)
-		auth.GET("/movies/:id", h.Movie.GetMovie)
-		auth.GET("/movies/:id/showtimes", h.Movie.GetShowtimes)
-		auth.GET("/showtimes/:id/seats", h.Movie.GetSeats)
 
 		auth.POST("/bookings/lock", h.Booking.LockSeat)
 		auth.POST("/bookings/pay", h.Booking.PayBooking)
