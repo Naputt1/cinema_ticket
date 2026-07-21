@@ -53,6 +53,36 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
+      path: '/admin/bookings',
+      name: 'admin-bookings',
+      component: () => import('./views/AdminBookingsView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: '/admin/logs',
+      name: 'admin-logs',
+      component: () => import('./views/AdminLogsView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: '/admin/movies',
+      name: 'admin-movies',
+      component: () => import('./views/AdminMoviesView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: '/admin/showtimes',
+      name: 'admin-showtimes',
+      component: () => import('./views/AdminShowtimesView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: '/admin/users',
+      name: 'admin-users',
+      component: () => import('./views/AdminUsersView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('./views/NotFoundView.vue'),
