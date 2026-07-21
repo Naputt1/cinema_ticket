@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import { Button } from '@/components/ui/button'
 
 const API = import.meta.env.VITE_API_URL || '/api/v1'
 const route = useRoute()
@@ -20,10 +21,7 @@ function loginWithGoogle() {
         <h1 class="text-3xl font-bold mb-2">Welcome</h1>
         <p class="text-muted-foreground">Sign in to book tickets and manage your bookings.</p>
       </div>
-      <button
-        @click="loginWithGoogle"
-        class="inline-flex items-center gap-3 px-6 py-3 border rounded-lg hover:bg-accent transition-colors text-sm font-medium"
-      >
+      <Button variant="outline" @click="loginWithGoogle" class="gap-3 px-6 py-3">
         <svg class="w-5 h-5" viewBox="0 0 24 24">
           <path
             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
@@ -43,7 +41,7 @@ function loginWithGoogle() {
           />
         </svg>
         Sign in with Google
-      </button>
+      </Button>
     </div>
   </div>
 </template>
