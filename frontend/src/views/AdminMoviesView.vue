@@ -1,6 +1,28 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardContent } from '@/components/ui/card'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog'
 
 const API = import.meta.env.VITE_API_URL || '/api/v1'
 
@@ -59,68 +81,72 @@ async function deleteMovie(id: string) {
   <div>
     <h1 class="text-2xl font-bold mb-6">Movies</h1>
 
-    <button @click="openCreateMovie" class="mb-4 px-4 py-2 bg-primary text-primary-foreground rounded text-sm">Add Movie</button>
+    <Button @click="openCreateMovie" class="mb-4">Add Movie</Button>
 
     <div v-if="isLoading" class="space-y-2">
-      <div v-for="i in 4" :key="i" class="border rounded p-3 animate-pulse">
-        <div class="h-4 bg-muted rounded w-1/3 mb-2" />
-        <div class="h-3 bg-muted rounded w-1/2" />
-      </div>
+      <Card v-for="i in 4" :key="i">
+        <CardContent class="space-y-2">
+          <Skeleton class="h-4 bg-muted rounded w-1/3" />
+          <Skeleton class="h-3 bg-muted rounded w-1/2" />
+        </CardContent>
+      </Card>
     </div>
 
     <div v-else-if="isError" class="text-center py-8">
       <p class="text-destructive mb-3">Failed to load movies</p>
-      <button @click="refetch()" class="px-4 py-2 rounded text-sm border">Retry</button>
+      <Button variant="outline" @click="refetch()">Retry</Button>
     </div>
 
     <div v-else-if="!movies?.length" class="text-muted-foreground">No movies yet</div>
 
-    <table v-else class="w-full text-sm">
-      <thead>
-        <tr class="border-b text-left">
-          <th class="pb-2">Poster</th>
-          <th class="pb-2">Title</th>
-          <th class="pb-2">Genre</th>
-          <th class="pb-2">Duration</th>
-          <th class="pb-2">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="m in movies as any[]" :key="m.id" class="border-b">
-          <td class="py-2">
+    <Table v-else>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Poster</TableHead>
+          <TableHead>Title</TableHead>
+          <TableHead>Genre</TableHead>
+          <TableHead>Duration</TableHead>
+          <TableHead>Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow v-for="m in movies as any[]" :key="m.id">
+          <TableCell>
             <img v-if="m.poster_url" :src="m.poster_url" alt="" class="w-10 h-14 object-cover rounded" />
             <div v-else class="w-10 h-14 bg-muted rounded" />
-          </td>
-          <td class="py-2 font-medium">{{ m.title }}</td>
-          <td class="py-2">{{ m.genre }}</td>
-          <td class="py-2">{{ m.duration }} min</td>
-          <td class="py-2">
+          </TableCell>
+          <TableCell class="font-medium">{{ m.title }}</TableCell>
+          <TableCell>{{ m.genre }}</TableCell>
+          <TableCell>{{ m.duration }} min</TableCell>
+          <TableCell>
             <div class="flex gap-2 items-center">
-              <button @click="openEditMovie(m)" class="text-primary underline">Edit</button>
-              <button @click="deleteMovie(m.id)" class="text-red-500 underline">Delete</button>
+              <Button variant="outline" size="xs" @click="openEditMovie(m)">Edit</Button>
+              <Button variant="destructive" size="xs" @click="deleteMovie(m.id)">Delete</Button>
             </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
 
-    <div v-if="showMovieModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" @click.self="showMovieModal = false">
-      <div class="bg-background rounded-lg p-6 w-full max-w-md">
-        <h2 class="text-lg font-bold mb-4">{{ editingMovie ? 'Edit Movie' : 'Add Movie' }}</h2>
+    <Dialog v-model:open="showMovieModal">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{{ editingMovie ? 'Edit Movie' : 'Add Movie' }}</DialogTitle>
+        </DialogHeader>
         <div class="space-y-3">
-          <input v-model="movieForm.title" placeholder="Title" class="w-full px-3 py-2 border rounded text-sm" />
-          <input v-model="movieForm.genre" placeholder="Genre" class="w-full px-3 py-2 border rounded text-sm" />
-          <input v-model="movieForm.duration" type="number" placeholder="Duration (min)" class="w-full px-3 py-2 border rounded text-sm" />
-          <textarea v-model="movieForm.description" placeholder="Description" class="w-full px-3 py-2 border rounded text-sm" rows="3" />
-          <input v-model="movieForm.poster_url" placeholder="Poster URL" class="w-full px-3 py-2 border rounded text-sm" />
+          <Input v-model="movieForm.title" placeholder="Title" />
+          <Input v-model="movieForm.genre" placeholder="Genre" />
+          <Input v-model="movieForm.duration" type="number" placeholder="Duration (min)" />
+          <Textarea v-model="movieForm.description" placeholder="Description" />
+          <Input v-model="movieForm.poster_url" placeholder="Poster URL" />
         </div>
-        <div class="flex justify-end gap-2 mt-4">
-          <button @click="showMovieModal = false" class="px-4 py-2 border rounded text-sm">Cancel</button>
-          <button @click="saveMovie" class="px-4 py-2 bg-primary text-primary-foreground rounded text-sm">
-            {{ editingMovie ? 'Update' : 'Create' }}
-          </button>
-        </div>
-      </div>
-    </div>
+        <DialogFooter>
+          <DialogClose as-child>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button @click="saveMovie">{{ editingMovie ? 'Update' : 'Create' }}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>
