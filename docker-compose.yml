@@ -79,17 +79,12 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "443:443"
-      - "80:80"
-    volumes:
-      - ./certs:/etc/nginx/certs:ro
+      - "5173:80"
     environment:
       VITE_API_URL: /api/v1
     depends_on:
       - backend
     restart: unless-stopped
-
-  # Certs must be placed in ./certs/ (cert.pem and key.pem)
 
 volumes:
   mongo_data:
